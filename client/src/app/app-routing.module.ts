@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { PreventUnsavedChangesGuard } from './guards/prevent-unsaved-changes.guard';
 import { HomeComponent } from './_components/home/home.component';
 import { ListsComponent } from './_components/lists/lists.component';
 import { MemberDetailComponent } from './_components/member-detail/member-detail.component';
+import { MemberEditComponent } from './_components/member-edit/member-edit.component';
 import { MemberListComponent } from './_components/member-list/member-list.component';
 import { MessagesComponent } from './_components/messages/messages.component';
 import { NotFoundComponent } from './_components/not-found/not-found.component';
@@ -18,6 +20,7 @@ const routes: Routes = [
     children: [
       {path:'members', component: MemberListComponent},
       {path:'members/:username', component: MemberDetailComponent},
+      {path:'member/edit', component: MemberEditComponent, canDeactivate: [PreventUnsavedChangesGuard]},
       {path:'lists', component: ListsComponent},
       {path:'messages', component: MessagesComponent},
     ]

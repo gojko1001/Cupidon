@@ -23,6 +23,7 @@
                 <a class="dropdown-toggle text-login" dropdownToggle>Welcome {{user.userName | titlecase}}</a>
                 <div class="dropdown-menu mt-3" *dropdownMenu>
                     <a href="" class="dropdown-item">Profile</a>
+                    <a class="dropdown-item" routerLink="/member/edit">Edit</a>
                     <a href="" class="dropdown-item" (click)="logout()">Logout</a>
                 </div>
             </div>
