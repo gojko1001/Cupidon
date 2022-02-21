@@ -20,7 +20,7 @@
             </ul>
 
             <div class="dropdown" *ngIf="(accountService.currentUser$ | async) as user" dropdown>
-                <a class="dropdown-toggle text-login" dropdownToggle>Welcome {{user.userName | titlecase}}</a>
+                <a class="dropdown-toggle text-login" dropdownToggle>Welcome {{user.username | titlecase}}</a>
                 <div class="dropdown-menu mt-3" *dropdownMenu>
                     <a href="" class="dropdown-item">Profile</a>
                     <a class="dropdown-item" routerLink="/member/edit">Edit</a>
@@ -31,7 +31,7 @@
             <form #loginForm="ngForm" class="form-inline mt-2 mt-md-0" (ngSubmit)="login()" autocomplete="off" *ngIf="(accountService.currentUser$ | async) === null">
                 <input
                     name="username"
-                    [(ngModel)]="creds.userName" 
+                    [(ngModel)]="creds.username" 
                     class="form-control mr-sm-2" 
                     type="text" 
                     placeholder="Username">

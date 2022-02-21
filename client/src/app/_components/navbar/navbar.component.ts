@@ -9,14 +9,14 @@ import { AccountService } from '../../_services/account.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
-  creds: { userName: string, password: string };
+  creds: { username: string, password: string };
 
   constructor(public accountService: AccountService,
               private router: Router,
               private toastr: ToastrService) { }
 
   ngOnInit(): void {
-    this.creds = { userName: '', password: '' };
+    this.creds = { username: '', password: '' };
   }
 
   login(){
