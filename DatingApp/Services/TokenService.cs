@@ -20,7 +20,7 @@ namespace DatingApp.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Name, user.UserName)
+                new Claim(JwtRegisteredClaimNames.NameId, user.UserName)
             };
             var tokenDescriptor = new SecurityTokenDescriptor
             {

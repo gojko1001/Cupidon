@@ -44,23 +44,6 @@ namespace API
             services.AddCors();
             services.AddApplicationServices(_config);
             services.AddIdentityServices(_config);
-            //services.AddDbContext<DataContext>(oprions =>
-            //{
-            //    oprions.UseSqlite(_config.GetConnectionString("DefaultConnection"));
-            //});
-            //services.AddScoped<ITokenService, TokenService>();
-            
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(opt =>
-            //    {
-            //        opt.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuerSigningKey = true,
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"])),
-            //            ValidateIssuer = false,
-            //            ValidateAudience = false
-            //        };
-            //    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
