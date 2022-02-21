@@ -43,7 +43,9 @@ namespace DatingApp.Data
         }
 
         public async Task<AppUser> GetUserByUsernameAsync(string username) 
-            => await _context.Users.SingleOrDefaultAsync(u => u.UserName == username);
+            => await _context.Users
+            .Include(p => p.Photos)
+            .SingleOrDefaultAsync(u => u.UserName == username);
 
         public async Task<bool> SaveAllAsync() 
             => await _context.SaveChangesAsync() > 0;
