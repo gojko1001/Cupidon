@@ -2,7 +2,6 @@
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Services.interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -14,13 +13,15 @@ namespace DatingApp.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly DataContext _context;
+        private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly DataContext _context;
 
-        public AccountController(DataContext context, ITokenService tokenService)
+        public AccountController(IUserRepository userRepository, ITokenService tokenService, DataContext context)
         {
-            _context = context;
+            _userRepository = userRepository;
             _tokenService = tokenService;
+            _context = context;
         }
 
         [HttpPost("register")]
@@ -40,7 +41,7 @@ namespace DatingApp.Controllers
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            await _userRepository.SaveAllAsync();
             return new UserDto
             {
                 Username = user.UserName,
@@ -51,7 +52,7 @@ namespace DatingApp.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
-            var user = await _context.Users.SingleOrDefaultAsync(x => x.UserName == loginDto.Username);
+            var user = await _userRepository.GetUserByUsernameAsync(loginDto.Username);
 
             if(user == null)
                 return Unauthorized("Invalid username or password!");
@@ -67,7 +68,8 @@ namespace DatingApp.Controllers
             return new UserDto
             {
                 Username = user.UserName,
-                Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user),
+                ProfilePhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain)?.Url
             };
         }
 

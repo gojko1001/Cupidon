@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TestErrorsComponent implements OnInit {
   baseUrl = 'https://localhost:5001/api/';
-  bugyUrl = 'buggy/';
+  buggyUrl = 'buggy/';
   validationErrors: string[] = [];
   
   constructor(private http: HttpClient) { }
@@ -17,7 +17,7 @@ export class TestErrorsComponent implements OnInit {
   }
 
   get404Error(){
-    this.http.get(this.bugyUrl + 'not-found').subscribe(response => {
+    this.http.get(this.buggyUrl + 'not-found').subscribe(response => {
       console.log(response);
     }, error => {
       console.log(error);
@@ -25,7 +25,7 @@ export class TestErrorsComponent implements OnInit {
   }
 
   get400Error(){
-    this.http.get(this.bugyUrl + 'bad-request').subscribe(response => {
+    this.http.get(this.buggyUrl + 'bad-request').subscribe(response => {
       console.log(response);
     }, error => {
       console.log(error);
@@ -33,7 +33,7 @@ export class TestErrorsComponent implements OnInit {
   }
 
   get401Error(){
-    this.http.get(this.bugyUrl + 'auth').subscribe(response => {
+    this.http.get(this.buggyUrl + 'auth').subscribe(response => {
       console.log(response);
     }, error => {
       console.log(error);
@@ -41,7 +41,7 @@ export class TestErrorsComponent implements OnInit {
   }
 
   get500Error(){
-    this.http.get(this.bugyUrl + 'server-error').subscribe(response => {
+    this.http.get(this.buggyUrl + 'server-error').subscribe(response => {
       console.log(response);
     }, error => {
       console.log(error);

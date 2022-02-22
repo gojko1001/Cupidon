@@ -24,6 +24,8 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { MemberEditComponent } from './_components/member-edit/member-edit.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
+import { PhotoEditorComponent } from './_components/photo-editor/photo-editor.component';
+import { ServerErrorComponent } from './_components/server-error/server-error.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +40,9 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
     TestErrorsComponent,
     NotFoundComponent,
     MemberCardComponent,
-    MemberEditComponent
+    MemberEditComponent,
+    PhotoEditorComponent,
+    ServerErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -55,7 +59,7 @@ import { LoadingInterceptor } from './interceptors/loading.interceptor';
   ],
   bootstrap: [AppComponent],
   schemas:[
-    CUSTOM_ELEMENTS_SCHEMA  // Added to suppress ngx gallery waning
+    CUSTOM_ELEMENTS_SCHEMA  // Added to suppress ngx gallery warning
   ]
 })
 export class AppModule { }

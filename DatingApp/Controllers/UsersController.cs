@@ -35,23 +35,10 @@ namespace DatingApp.Controllers
             return await _userRepository.GetMemberAsync(username);
         }
 
-        [HttpPut]
-        public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
-        {
-            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _userRepository.GetUserByUsernameAsync(username);
-
-            _mapper.Map(memberUpdateDto, user);
-            _userRepository.Update(user);
-            if(await _userRepository.SaveAllAsync()) return NoContent();
-            return BadRequest("Failed to update user");
-        }
-
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _userRepository.GetUserByUsernameAsync(username);
+            var user = await GetUserFromToken();
 
             var result = await _photoService.AddPhotoAsync(file);
             if(result.Error != null)
@@ -76,6 +63,45 @@ namespace DatingApp.Controllers
             }
 
             return BadRequest("Error while adding new photo!");
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto)
+        {
+            var user = await GetUserFromToken();
+
+            _mapper.Map(memberUpdateDto, user);
+            _userRepository.Update(user);
+            if(await _userRepository.SaveAllAsync()) return NoContent();
+            return BadRequest("Failed to update user");
+        }
+
+        [HttpPut("set-main-photo/{photoId}")]
+        public async Task<ActionResult> SetMainPhoto(int photoId)
+        {
+            var user = await GetUserFromToken();
+
+            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
+
+            if (photo.IsMain)
+                return BadRequest("This is already your main photo");
+
+            var currentMain = user.Photos.FirstOrDefault(p => p.IsMain);
+            
+            if (currentMain != null)
+                currentMain.IsMain = false;
+            photo.IsMain = true;
+
+            if(await _userRepository.SaveAllAsync())
+                return NoContent();
+            return BadRequest("Failed to set main photo");
+        }
+
+
+        private async Task<AppUser> GetUserFromToken()
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return await _userRepository.GetUserByUsernameAsync(username);
         }
     }
 }
