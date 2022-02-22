@@ -1,8 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FileUploader } from 'ng2-file-upload';
 import { take } from 'rxjs/operators';
+import { Photo } from 'src/app/_model/photo';
 import { Member, User } from 'src/app/_model/user';
 import { AccountService } from 'src/app/_services/account.service';
+import { MembersService } from 'src/app/_services/members.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -18,12 +20,32 @@ export class PhotoEditorComponent implements OnInit {
   usersUrl = environment.apiUrl + 'users/'
   user: User;
 
-  constructor(private accountService: AccountService) {
+  constructor(private accountService: AccountService, private memberService: MembersService) {
     this.accountService.currentUser$.pipe(take(1)).subscribe(response => this.user = response)
    }
 
   ngOnInit(): void {
     this.initilizeUploader();
+  }
+
+  setMainPhoto(photo: Photo){
+    this.memberService.setMainPhoto(photo.id).subscribe(() => {
+      this.user.profilePhotoUrl = photo.url;
+      this.accountService.setCurrentUser(this.user);
+      this.member.photoUrl = photo.url;
+      this.member.photos.forEach(p => {
+        if(p.isMain)
+          p.isMain = false;
+        if(p.id === photo.id)
+          p.isMain = true;
+      })
+    })
+  }
+
+  deletePhoto(photoId: number){
+    this.memberService.deletePhoto(photoId).subscribe(() => {
+      this.member.photos = this.member.photos.filter(p => p.id !== photoId);
+    })
   }
 
   fileOverBase(e: any){
