@@ -2,30 +2,27 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import { FormsModule } from '@angular/forms'
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { ToastrModule } from 'ngx-toastr';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NavbarComponent } from './_components/navbar/navbar.component';
-import { HomeComponent } from './_components/home/home.component';
-import { RegisterComponent } from './_components/register/register.component';
-import { MemberListComponent } from './_components/member-list/member-list.component';
-import { MemberDetailComponent } from './_components/member-detail/member-detail.component';
-import { ListsComponent } from './_components/lists/lists.component';
-import { MessagesComponent } from './_components/messages/messages.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { HomeComponent } from './components/home/home.component';
+import { RegisterComponent } from './components/register/register.component';
+import { MemberListComponent } from './components/member-list/member-list.component';
+import { MemberDetailComponent } from './components/member-detail/member-detail.component';
+import { ListsComponent } from './components/lists/lists.component';
+import { MessagesComponent } from './components/messages/messages.component';
 import { SharedModule } from './modules/shared.module';
-import { TestErrorsComponent } from './_components/test-errors/test-errors.component';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
-import { NotFoundComponent } from './_components/not-found/not-found.component';
-import { MemberCardComponent } from './_components/member-card/member-card.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { MemberCardComponent } from './components/member-card/member-card.component';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
-import { MemberEditComponent } from './_components/member-edit/member-edit.component';
+import { MemberEditComponent } from './components/member-edit/member-edit.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
-import { PhotoEditorComponent } from './_components/photo-editor/photo-editor.component';
-import { ServerErrorComponent } from './_components/server-error/server-error.component';
+import { PhotoEditorComponent } from './components/photo-editor/photo-editor.component';
+import { ServerErrorComponent } from './components/server-error/server-error.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +34,6 @@ import { ServerErrorComponent } from './_components/server-error/server-error.co
     MemberDetailComponent,
     ListsComponent,
     MessagesComponent,
-    TestErrorsComponent,
     NotFoundComponent,
     MemberCardComponent,
     MemberEditComponent,

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgxGalleryAnimation, NgxGalleryImage, NgxGalleryOptions } from '@kolkov/ngx-gallery';
-import { Member } from 'src/app/_model/user';
-import { MembersService } from 'src/app/_services/members.service';
+import { Member } from 'src/app/model/user';
+import { MembersService } from 'src/app/services/members.service';
 
 @Component({
   selector: 'app-member-detail',

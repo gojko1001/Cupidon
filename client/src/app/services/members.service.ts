@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { of } from 'rxjs/internal/observable/of';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { Member } from '../_model/user';
+import { Member } from '../model/user';
 
 
 @Injectable({
