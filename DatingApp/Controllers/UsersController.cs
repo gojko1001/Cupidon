@@ -2,7 +2,9 @@
 using DatingApp.Data;
 using DatingApp.DTOs;
 using DatingApp.Entities;
+using DatingApp.Extensions;
 using DatingApp.Services.interfaces;
+using DatingApp.Utils;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -24,9 +26,11 @@ namespace DatingApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userParams)
         {
-            return Ok(await _userRepository.GetMembersAsync());
+            var users = await _userRepository.GetMembersAsync(userParams);
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+            return base.Ok(users);
         }
 
         [HttpGet("{username}", Name = "GetUser")]
