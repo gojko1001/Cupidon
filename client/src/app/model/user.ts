@@ -4,7 +4,10 @@ export interface User {
     username: string;
     token: string;
     profilePhotoUrl: string;
+    knownAs: string;
+    gender: string;
 }
+
 
 export interface Member {
     id: number;
@@ -21,4 +24,17 @@ export interface Member {
     city: string;
     country: string;
     photos: Photo[];
+}
+
+export class UserParams {
+    gender: string;
+    minAge = 18;
+    maxAge = 99;
+    pageNumber = 1;
+    pageSize = 5;
+    orederBy: 'lastActive';
+
+    constructor(user: User){
+        this.gender = user.gender === 'female' ? 'male' : 'female';
+    }
 }
