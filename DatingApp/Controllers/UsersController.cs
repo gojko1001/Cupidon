@@ -6,10 +6,10 @@ using DatingApp.Extensions;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace DatingApp.Controllers
 {
+    [ServiceFilter(typeof(LogUserActivity))]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -131,10 +131,6 @@ namespace DatingApp.Controllers
         }
 
 
-        private async Task<AppUser> GetUserFromToken()
-        {
-            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return await _userRepository.GetUserByUsernameAsync(username);
-        }
+        private async Task<AppUser> GetUserFromToken() => await _userRepository.GetUserByUsernameAsync(User.GetUsername());
     }
 }
