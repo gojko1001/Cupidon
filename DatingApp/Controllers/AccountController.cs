@@ -2,6 +2,7 @@
 using DatingApp.Data;
 using DatingApp.DTOs;
 using DatingApp.Entities;
+using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils;
 using Microsoft.AspNetCore.Mvc;

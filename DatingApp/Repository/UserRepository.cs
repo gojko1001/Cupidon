@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using DatingApp.Data;
 using DatingApp.DTOs;
 using DatingApp.Entities;
+using DatingApp.Repository.Interfaces;
 using DatingApp.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace DatingApp.Data
+namespace DatingApp.Repository
 {
     public class UserRepository : IUserRepository
     {

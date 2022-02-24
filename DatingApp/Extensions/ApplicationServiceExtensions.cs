@@ -1,4 +1,6 @@
 ﻿using DatingApp.Data;
+using DatingApp.Repository;
+using DatingApp.Repository.Interfaces;
 using DatingApp.Services;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils;
@@ -19,6 +21,7 @@ namespace DatingApp.Extensions
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ILikesRepository, LikesRepository>();
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;
