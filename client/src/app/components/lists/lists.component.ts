@@ -29,7 +29,7 @@ export class ListsComponent implements OnInit {
   }
 
   pageChanged(event: any){
-    this.pageNumber = event.pageNumber;
+    this.pageNumber = event.page;
     this.loadLikes();
   }
 
