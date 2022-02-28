@@ -6,6 +6,7 @@ export interface User {
     profilePhotoUrl: string;
     knownAs: string;
     gender: string;
+    roles: string[];
 }
 
 

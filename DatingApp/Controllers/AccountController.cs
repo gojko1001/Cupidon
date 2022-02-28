@@ -71,7 +71,7 @@ namespace DatingApp.Controllers
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
             if(!result.Succeeded)
-                return Unauthorized();
+                return Unauthorized("Invalid username or password!");
 
             return new UserDto
             {

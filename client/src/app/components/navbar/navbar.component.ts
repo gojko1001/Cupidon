@@ -22,8 +22,6 @@ export class NavbarComponent implements OnInit {
   login(){
     this.accountService.login(this.creds).subscribe( response => {
       this.router.navigateByUrl('/members');
-    }, error => {
-      this.toastr.error(error.error);
     })
   }
 

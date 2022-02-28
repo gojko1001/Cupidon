@@ -11,6 +11,8 @@ import { MessagesComponent } from './components/messages/messages.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ServerErrorComponent } from './components/server-error/server-error.component';
 import { MemberDetailedResolver } from './resolvers/member-detailed.resolver';
+import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
+import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
   {path:'', component: HomeComponent},
@@ -24,6 +26,7 @@ const routes: Routes = [
       {path:'member/edit', component: MemberEditComponent, canDeactivate: [PreventUnsavedChangesGuard]},
       {path:'lists', component: ListsComponent},
       {path:'messages', component: MessagesComponent},
+      {path:'admin', component: AdminPanelComponent, canActivate: [AdminGuard]}
     ]
   },
   {path: 'server-error', component: ServerErrorComponent},

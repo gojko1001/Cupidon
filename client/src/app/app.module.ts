@@ -27,6 +27,11 @@ import { SharedModule } from './modules/shared.module';
 import { TextInputComponent } from './forms/text-input/text-input.component';
 import { DateInputComponent } from './forms/date-input/date-input.component';
 import { MemberMessagesComponent } from './components/member-messages/member-messages.component';
+import { AdminPanelComponent } from './components/admin-panel/admin-panel.component';
+import { HasRoleDirective } from './directives/has-role.directive';
+import { UserManagementComponent } from './components/user-management/user-management.component';
+import { PhotoManagementComponent } from './components/photo-management/photo-management.component';
+import { RolesModalComponent } from './components/modals/roles-modal/roles-modal.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +50,12 @@ import { MemberMessagesComponent } from './components/member-messages/member-mes
     ServerErrorComponent,
     TextInputComponent,
     DateInputComponent,
-    MemberMessagesComponent
+    MemberMessagesComponent,
+    AdminPanelComponent,
+    HasRoleDirective,
+    UserManagementComponent,
+    PhotoManagementComponent,
+    RolesModalComponent
   ],
   imports: [
     BrowserModule,
