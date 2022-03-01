@@ -8,6 +8,7 @@ import { Member } from 'src/app/model/user';
 import { LikesService } from 'src/app/services/likes.service';
 import { MembersService } from 'src/app/services/members.service';
 import { MessageService } from 'src/app/services/message.service';
+import { PresenceService } from 'src/app/services/presence.service';
 
 @Component({
   selector: 'app-member-detail',
@@ -27,7 +28,8 @@ export class MemberDetailComponent implements OnInit {
               private messageService: MessageService,
               private likesService: LikesService,
               private toastr: ToastrService,
-              private route: ActivatedRoute) { }
+              private route: ActivatedRoute,
+              public presence: PresenceService) { }
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {

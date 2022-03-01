@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DatingApp.DTOs;
 using DatingApp.Entities;
-using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils;
 using Microsoft.AspNetCore.Identity;
@@ -15,16 +14,14 @@ namespace DatingApp.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(IUserRepository userRepository, ITokenService tokenService, IMapper mapper,
+        public AccountController(ITokenService tokenService, IMapper mapper,
             UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
-            _userRepository = userRepository;
             _tokenService = tokenService;
             _mapper = mapper;
             _userManager = userManager;

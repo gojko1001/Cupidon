@@ -3,6 +3,7 @@ using DatingApp.Repository;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services;
 using DatingApp.Services.interfaces;
+using DatingApp.SignalR;
 using DatingApp.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ namespace DatingApp.Extensions
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
         {
+            services.AddSingleton<PresenceTracker>();
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
             services.AddDbContext<DataContext>(options =>
             {
