@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgxGalleryAnimation, NgxGalleryImage, NgxGalleryOptions } from '@kolkov/ngx-gallery';
 import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { ToastrService } from 'ngx-toastr';
@@ -34,8 +34,10 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
               private likesService: LikesService,
               private toastr: ToastrService,
               private route: ActivatedRoute,
+              private router: Router,
               public presence: PresenceService) {
                 this.accountService.currentUser$.pipe(take(1)).subscribe(data => this.user = data);
+                this.router.routeReuseStrategy.shouldReuseRoute = () => false;
                }
                
 
@@ -89,7 +91,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   addLike(member: Member){
     this.likesService.addLike(member.username).subscribe(() => {
-      this.toastr.success('You ave liked ' + member.knownAs);
+      this.toastr.success('You have liked ' + member.knownAs);
     });
   }
   onTabActivated(data: TabDirective){

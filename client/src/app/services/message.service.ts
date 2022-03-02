@@ -4,6 +4,7 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { Group } from '../model/group';
 import { Message } from '../model/message';
 import { User } from '../model/user';
 import { getPaginatedResult, getPaginationHeaders } from './paginationUtil';
@@ -38,6 +39,19 @@ export class MessageService {
       this.messageThread$.pipe(take(1)).subscribe(messages => {
         this.messageThreadSource.next([...messages, message]);
       })
+    })
+
+    this.hubConnection.on("UpdatedGroup", (group: Group) => {
+      if(group.connections.some(x => x.username === otherUsername)){
+        this.messageThread$.pipe(take(1)).subscribe(messages => {
+          messages.forEach(message => {
+            if(!message.dateRead){
+              message.dateRead = new Date(Date.now())
+            }
+          })
+          this.messageThreadSource.next([...messages]);
+        })
+      }
     })
   }
 

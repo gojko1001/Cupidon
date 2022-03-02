@@ -8,6 +8,7 @@ namespace DatingApp.Repository.Interfaces
         void RemoveConnection(Connection connection);
         Task<Connection> GetConnectionAsync(string connectionId);
         Task<Group> GetMessageGroup(string groupName);
+        Task<Group> GetGroupForConnection(string connectionId);
         Task<bool> SaveAllAsync();
     }
 }
