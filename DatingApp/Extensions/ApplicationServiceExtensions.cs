@@ -25,6 +25,7 @@ namespace DatingApp.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ILikesRepository, LikesRepository>();
             services.AddScoped<IMessageRepository, MessageRepository>();
+            services.AddScoped<IGroupRepository, GroupRepository>();
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;
