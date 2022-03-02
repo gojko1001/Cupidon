@@ -22,10 +22,7 @@ namespace DatingApp.Extensions
             services.AddScoped<LogUserActivity>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<ILikesRepository, LikesRepository>();
-            services.AddScoped<IMessageRepository, MessageRepository>();
-            services.AddScoped<IGroupRepository, GroupRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;

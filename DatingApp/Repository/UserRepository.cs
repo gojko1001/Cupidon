@@ -63,8 +63,6 @@ namespace DatingApp.Repository
             .Include(p => p.Photos)
             .SingleOrDefaultAsync(u => u.UserName == username);
 
-        public async Task<bool> SaveAllAsync() 
-            => await _context.SaveChangesAsync() > 0;
 
         public void Update(AppUser user)
         {
