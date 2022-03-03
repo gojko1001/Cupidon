@@ -17,6 +17,8 @@ namespace DatingApp.Repository
 
         public IUserRepository UserRepository => new UserRepository(_context, _mapper);
 
+        public IPhotoRepository PhotoRepository => new PhotoRepository(_context);
+
         public IMessageRepository MessageRepository => new MessageRepository(_context, _mapper);
 
         public ILikesRepository LikesRepository => new LikesRepository(_context);

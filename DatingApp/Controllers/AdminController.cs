@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using DatingApp.DTOs;
+using DatingApp.Repository.Interfaces;
+using DatingApp.Services.interfaces;
 
 namespace DatingApp.Controllers
 {
@@ -13,10 +16,14 @@ namespace DatingApp.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IPhotoService _photoService;
 
-        public AdminController(UserManager<AppUser> userManager)
+        public AdminController(UserManager<AppUser> userManager, IUnitOfWork unitOfWork, IPhotoService photoService)
         {
             _userManager = userManager;
+            _unitOfWork = unitOfWork;
+            _photoService = photoService;
         }
 
         [Authorize(Policy = "RequireAdminRole")]
@@ -37,11 +44,57 @@ namespace DatingApp.Controllers
 
         [Authorize(Policy = "ModeratePhotoRole")]
         [HttpGet("photos-to-moderate")]
-        public ActionResult GetPhotosForModeration()
+        public async Task<ActionResult<IEnumerable<PhotoForApprovalDto>>> GetPhotosForApproval()
         {
-            return Ok("Admins or moderators can see this");
+            return Ok(await _unitOfWork.PhotoRepository.GetUnapprovedPhotos());
         }
 
+        [Authorize(Policy = "ModeratePhotoRole")]
+        [HttpPost("approve-photo/{photoId}")]
+        public async Task<ActionResult> ApprovePhoto(int photoId)
+        {
+            var photo = await _unitOfWork.PhotoRepository.GetPhotoByIdAsync(photoId);
+            if (photo == null)
+                return BadRequest("Photo not found");
+
+            photo.IsApproved = true;
+            
+            var user = await _unitOfWork.UserRepository.GetUserByPhotoIdAsync(photoId);
+            if(user != null && !user.Photos.Any(p => p.IsMain))
+            {
+                photo.IsMain = true;
+            }
+
+            if(await _unitOfWork.Complete())
+                return Ok();
+            return BadRequest("Failed to approve photo");
+        }
+
+        [Authorize(Policy = "ModeratePhotoRole")]
+        [HttpPost("reject-photo/{photoId}")]
+        public async Task<ActionResult> RejectPhoto(int photoId)
+        {
+            var photo = await _unitOfWork.PhotoRepository.GetPhotoByIdAsync(photoId);
+            if (photo == null)
+                return BadRequest("Photo not found");
+            if(photo.PublicId != null)
+            {
+                var result = await _photoService.DeletePhotoAsync(photo.PublicId);
+                if(result.Error == null)
+                    _unitOfWork.PhotoRepository.DeletePhoto(photo);
+            }
+            else
+            {
+                _unitOfWork.PhotoRepository.DeletePhoto(photo);
+            }
+
+            if(await _unitOfWork.Complete())
+                return Ok();
+            return BadRequest("Failed to delete photo");
+        }
+
+
+        [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("edit-roles/{username}")]
         public async Task<ActionResult> EditRoles(string username, [FromQuery]string roles)
         {
