@@ -64,7 +64,7 @@ namespace DatingApp.Repository
                 .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
             var unreadMessages = messages.Where(m => m.DateRead == null && 
-                                                m.RecipientUsername == currentUsername);
+                                                m.RecipientUsername == currentUsername).ToList();
             if (unreadMessages.Any())
             {
                 foreach(var message in unreadMessages)
