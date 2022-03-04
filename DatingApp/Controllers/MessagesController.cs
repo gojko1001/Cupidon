@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using DatingApp.DTOs;
-using DatingApp.Entities;
+﻿using DatingApp.DTOs;
 using DatingApp.Extensions;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Utils;
@@ -28,12 +26,6 @@ namespace DatingApp.Controllers
             var messages = await _unitOfWork.MessageRepository.GetMessagesForUserAsync(messageParams);
             Response.AddPaginationHeader(messages.CurrentPage, messages.PageSize, messages.TotalCount, messages.TotalPages);
             return Ok(messages);
-        }
-
-        [HttpGet("thread/{username}")]
-        public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageThread(string username)
-        {
-            return Ok(await _unitOfWork.MessageRepository.GetMessageThread(User.GetUsername(), username));
         }
 
         [HttpDelete("{id}")]

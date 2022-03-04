@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Message } from 'src/app/model/message';
 import { MessageService } from 'src/app/services/message.service';
 
 @Component({
@@ -12,7 +11,6 @@ import { MessageService } from 'src/app/services/message.service';
 })
 export class MemberMessagesComponent implements OnInit {
   @ViewChild('messageForm') messageForm: NgForm
-  @Input() messages: Message[];
 
   username = this.route.snapshot.paramMap.get('username');
   messageContent: string;

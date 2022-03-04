@@ -3,8 +3,13 @@
          <div class="card">
              <img src="{{member.photoUrl || './assets/user.png'}}" alt="{{member.knownAs}}" class="card-img-top img-thumbnail">
              <div class="card-body">
-                 <div class="mb-2" *ngIf="(presence.onlineUsers$ | async).includes(member.username)">
-                     <i class="fa fa-user-circle text-success"></i> Active
+                 <div *ngIf="member.username != user.username">
+                     <div class="mb-2 text-success" *ngIf="(presence.onlineUsers$ | async).includes(member.username)">
+                         <i class="fa fa-user-circle"></i> Active
+                     </div>
+                     <div class="mb-2" *ngIf="!(presence.onlineUsers$ | async).includes(member.username)">
+                         <i class="fa fa-clock-o"></i> {{member.lastActive | timeago}}
+                     </div>
                  </div>
                 <div>
                     <strong>Location: </strong>
@@ -15,18 +20,17 @@
                     <p>{{member.age}}</p>
                 </div>
                 <div>
-                    <strong>Last Active: </strong>
-                    <p>{{member.lastActive | timeago}}</p>
-                </div>
-                <div>
                     <strong>Member since: </strong>
                     <p>{{member.created | date:'dd. MMM, yyyy.'}}</p>
                 </div>
              </div>
              <div class="card-footer">
                  <div class="btn-group d-flex">
-                     <button class="btn btn-primary" (click)="addLike(member)">Like</button>
-                     <button class="btn btn-secondary" (click)="selectTab(3)">Message</button>
+                     <ng-container *ngIf="member.username != user.username">
+                         <button class="btn btn-primary" (click)="addLike(member)">Like</button>
+                         <button class="btn btn-secondary" (click)="selectTab(3)">Message</button>
+                     </ng-container>
+                     <button class="btn btn-primary" *ngIf="member.username == user.username" routerLink="/member/edit">Edit</button>
                  </div>
              </div>
          </div>
@@ -48,7 +52,10 @@
                style="display: inline-block; margin-bottom: 20px;"></ngx-gallery> 
             </tab>
             <tab heading="Messages" (selectTab)="onTabActivated($event)">
-                <app-member-messages></app-member-messages>
+                <app-member-messages *ngIf="member.username != user.username"></app-member-messages>
+                <div *ngIf="member.username == user.username" class="btn-group d-flex">
+                    <button class="btn btn-primary" [routerLink]="['/messages']">Go to messages</button>
+                </div>
             </tab>
          </tabset>
      </div>

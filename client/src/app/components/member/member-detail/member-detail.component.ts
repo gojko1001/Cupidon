@@ -4,11 +4,9 @@ import { NgxGalleryAnimation, NgxGalleryImage, NgxGalleryOptions } from '@kolkov
 import { TabDirective, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
-import { Message } from 'src/app/model/message';
 import { Member, User } from 'src/app/model/user';
 import { AccountService } from 'src/app/services/account.service';
 import { LikesService } from 'src/app/services/likes.service';
-import { MembersService } from 'src/app/services/members.service';
 import { MessageService } from 'src/app/services/message.service';
 import { PresenceService } from 'src/app/services/presence.service';
 
@@ -22,14 +20,12 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   user: User;
   member: Member;
-  messages: Message[] = [];
 
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
   activeTab: TabDirective;
 
   constructor(private accountService: AccountService,
-              private memberService: MembersService,
               private messageService: MessageService,
               private likesService: LikesService,
               private toastr: ToastrService,
@@ -47,7 +43,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     })
 
     this.route.queryParams.subscribe(params => {
-      params.tab ? this.selectTab(params.tab) : this.selectTab(0);
+      params.tab ? this.selectTab(Number(params.tab)) : this.selectTab(0);
     });
 
     this.galleryOptions = [
@@ -67,36 +63,27 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   getImages(): NgxGalleryImage[] {
     const imageUrls = [];
     for(let photo of this.member.photos){
-      imageUrls.push({
-        small: photo?.url,
-        medium: photo?.url,
-        big: photo?.url
-      });
+      if(photo.isApproved){
+        imageUrls.push({
+          small: photo?.url,
+          medium: photo?.url,
+          big: photo?.url
+        });
+      }
     }
     return imageUrls;
   }
 
-  loadMember(){
-    this.memberService.getMember(this.route.snapshot.paramMap.get('username')).subscribe(response => {
-      this.member = response;
-      
-    })
-  }
-
-  loadMessages(){
-    this.messageService.getMessageThread(this.member.username).subscribe(response => {
-      this.messages = response;
-    })
-  }
 
   addLike(member: Member){
     this.likesService.addLike(member.username).subscribe(() => {
       this.toastr.success('You have liked ' + member.knownAs);
     });
   }
+  
   onTabActivated(data: TabDirective){
     this.activeTab = data;
-    if(this.activeTab.heading === 'Messages' && this.messages.length === 0){
+    if(this.activeTab.heading === 'Messages'){
       this.messageService.createHubConnection(this.user, this.member.username);   
     } else {
       this.messageService.stopHubConnection();

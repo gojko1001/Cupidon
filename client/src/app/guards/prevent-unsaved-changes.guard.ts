@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanDeactivate } from '@angular/router';
 import { Observable } from 'rxjs';
-import { MemberEditComponent } from '../components/member-edit/member-edit.component';
+import { MemberEditComponent } from '../components/member/member-edit/member-edit.component';
 import { ConfirmService } from '../services/confirm.service';
 
 @Injectable({

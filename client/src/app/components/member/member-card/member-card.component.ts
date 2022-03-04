@@ -13,7 +13,7 @@ export class MemberCardComponent implements OnInit {
   @Input() member: Member;
   
   constructor(private likesService: LikesService,
-              private taostr: ToastrService,
+              private toastr: ToastrService,
               public presence: PresenceService) { }
 
   ngOnInit(): void {
@@ -21,7 +21,7 @@ export class MemberCardComponent implements OnInit {
 
   addLike(member: Member){
     this.likesService.addLike(member.username).subscribe(() => {
-      this.taostr.success('You have liked ' + member.knownAs);
+      this.toastr.success('You have liked ' + member.knownAs);
     });
   }
 
