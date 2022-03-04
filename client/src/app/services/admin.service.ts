@@ -15,7 +15,19 @@ export class AdminService {
     return this.http.get<Partial<User[]>>(this.adminUrl + "/users-with-roles");
   }
 
-  updateUserROles(username: string, roles: string[]){
+  updateUserRoles(username: string, roles: string[]){
     return this.http.post(this.adminUrl + '/edit-roles/' + username + "?roles=" + roles, {});
+  }
+
+  getPhotosForApproval(){
+    return this.http.get(this.adminUrl + "/photos-to-moderate");
+  }
+
+  approvePhoto(photoId: number){
+    return this.http.post(this.adminUrl + "/approve-photo/" + photoId, {});
+  }
+
+  rejectPhoto(photoId: number){
+    return this.http.post(this.adminUrl + "/reject-photo/" + photoId, {});
   }
 }
