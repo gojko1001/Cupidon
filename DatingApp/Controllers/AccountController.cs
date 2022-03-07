@@ -2,14 +2,12 @@
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Services.interfaces;
-using DatingApp.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace DatingApp.Controllers
 {
-    [ServiceFilter(typeof(LogUserActivity))]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase

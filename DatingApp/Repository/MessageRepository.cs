@@ -56,13 +56,15 @@ namespace DatingApp.Repository
         public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
         {
             var messages = await _context.Messages
+                .Include(m => m.Sender).ThenInclude(u => u.Photos)
+                .Include(m => m.Recipient).ThenInclude(u => u.Photos)
                 .Where(m => m.Recipient.UserName == currentUsername && !m.RecipientDeleted &&
                         m.Sender.UserName == recipientUsername ||
                         m.Recipient.UserName == recipientUsername && !m.SenderDeleted &&
                         m.Sender.UserName == currentUsername)
                 .OrderBy(m => m.DateSent)
-                .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
+
             var unreadMessages = messages.Where(m => m.DateRead == null && 
                                                 m.RecipientUsername == currentUsername).ToList();
             if (unreadMessages.Any())
@@ -72,7 +74,7 @@ namespace DatingApp.Repository
                     message.DateRead = DateTime.UtcNow;
                 }
             }
-            return messages;
+            return _mapper.Map<IEnumerable<MessageDto>>(messages);
         }
     }
 }

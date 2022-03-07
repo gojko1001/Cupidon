@@ -1,4 +1,5 @@
 ﻿using DatingApp.Extensions;
+using DatingApp.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -8,10 +9,12 @@ namespace DatingApp.SignalR
     public class PresenceHub : Hub
     {
         private readonly PresenceTracker _tracker;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PresenceHub(PresenceTracker tracker)
+        public PresenceHub(PresenceTracker tracker, IUnitOfWork unitOfWork)
         {
             _tracker = tracker;
+            _unitOfWork = unitOfWork;
         }
 
         public override async Task OnConnectedAsync()
@@ -20,6 +23,7 @@ namespace DatingApp.SignalR
             if (isOnline)
             {
                 await Clients.Others.SendAsync("UserIsOnline", Context.User.GetUsername());
+                updateUserLastActive();
             }
 
             var currentUsers = await _tracker.GetOnlineUsers();
@@ -32,9 +36,21 @@ namespace DatingApp.SignalR
             if (isOffline)
             {
                 await Clients.Others.SendAsync("UserIsOffline", Context.User.GetUsername());
+                updateUserLastActive();
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+
+        private async void updateUserLastActive()
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(Context.User.GetUsername());
+            if (user != null)
+            {
+                user.LastActive = DateTime.UtcNow;
+                await _unitOfWork.Complete();
+            }
         }
     }
 }
