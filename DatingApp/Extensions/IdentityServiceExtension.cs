@@ -14,8 +14,13 @@ namespace DatingApp.Extensions
             services.AddIdentityCore<AppUser>(opts =>
             {
                 opts.Password.RequiredLength = 8;
-                opts.Password.RequireNonAlphanumeric = false;
-                opts.Password.RequireDigit = false;
+                opts.Password.RequireNonAlphanumeric = true;
+                opts.Password.RequireDigit = true;
+                opts.Password.RequireLowercase = true;
+                opts.Password.RequireUppercase = true;
+
+                //opts.Lockout.MaxFailedAccessAttempts = 5;
+                //opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
             })
                 .AddRoles<AppRole>()
                 .AddRoleManager <RoleManager<AppRole>>()

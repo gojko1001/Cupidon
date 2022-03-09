@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using DatingApp.DTOs;
 using DatingApp.Entities;
+using DatingApp.Extensions;
 using DatingApp.Services.interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -76,6 +78,28 @@ namespace DatingApp.Controllers
                 KnownAs = user.KnownAs,
                 Gender = user.Gender
             };
+        }
+
+        [Authorize]
+        [HttpPut("update-password")]
+        public async Task<ActionResult> ChangePassword(PasswordChangeDto passwordChangeDto)
+        {
+            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == User.GetId());
+            if (user == null)
+                return Unauthorized();
+            var result = await _signInManager.CheckPasswordSignInAsync(user, passwordChangeDto.OldPassword, false);
+            if (!result.Succeeded)
+                return Unauthorized("Old password is incorrect!");
+
+            if (passwordChangeDto.Password != passwordChangeDto.RepeatPassword)
+                return BadRequest("New password and repeat password must be the same");
+            if (passwordChangeDto.Password == passwordChangeDto.OldPassword)
+                return BadRequest("New password can't be same as current");
+
+            var changeResult = await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.Password);
+            if (changeResult.Errors.Any())
+                return BadRequest(changeResult.Errors);
+            return Ok();
         }
 
         private async Task<bool> UserExists(string username) => await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());

@@ -33,6 +33,7 @@ namespace DatingApp.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
+                NotBefore = DateTime.Now,
                 Expires = DateTime.Now.AddDays(7),
                 SigningCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature)
             };

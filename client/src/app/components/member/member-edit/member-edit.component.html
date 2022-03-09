@@ -42,14 +42,17 @@
                     <h4 class="mt-2">Location Details:</h4>
                     <div class="form-inline">
                         <label for="city">City: </label>
-                        <input class="form-control" [(ngModel)]="member.city" type="text" name="city" class="form-control mx-2">
+                        <input [(ngModel)]="member.city" type="text" name="city" class="form-control mx-2">
                         <label for="country">Country: </label>
-                        <input class="form-control" [(ngModel)]="member.country" type="text" name="country" class="form-control mx-2">
+                        <input [(ngModel)]="member.country" type="text" name="country" class="form-control mx-2">
                     </div>
                 </form>
             </tab>
            <tab heading="Edit Photos">
                 <app-photo-editor [member]="member"></app-photo-editor>
+           </tab>
+           <tab heading="Password">
+                <app-password-change></app-password-change>
            </tab>
         </tabset>
     </div>

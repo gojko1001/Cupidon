@@ -1,7 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AccountService } from 'src/app/services/account.service';
+import { lowercasePattern, matchValues, numberPattern, specialCharPattern, uppercasePattern } from '../forms/custom-validation';
 
 @Component({
   selector: 'app-register',
@@ -33,19 +34,13 @@ export class RegisterComponent implements OnInit {
       city: [''],
       country: [''],
       username: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', [Validators.required, this.matchValues('password')]]
+      password: ['', [Validators.required, Validators.minLength(8), numberPattern(), lowercasePattern(), uppercasePattern(), specialCharPattern()]],
+      confirmPassword: ['', [Validators.required, matchValues('password')]]
     });
 
     this.registerForm.controls.password.valueChanges.subscribe(() => {        // Ensures that after matching password we invalidate password field on change
       this.registerForm.controls.confirmPassword.updateValueAndValidity();
     })
-  }
-
-  matchValues(matchTo: string): ValidatorFn {
-    return (control: AbstractControl) => {
-      return control?.value === control?.parent?.controls[matchTo].value ? null : {isMatching: true}
-    }
   }
 
   register(){
