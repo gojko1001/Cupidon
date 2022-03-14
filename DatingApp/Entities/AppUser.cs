@@ -21,6 +21,7 @@ namespace DatingApp.Entities
         public ICollection<Message> MessagesSent { get; set; }
         public ICollection<Message> MessagesRecieved { get; set; }
         public ICollection<AppUserRole> Roles { get; set; }
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
 
         public int GetAge() => DateOfBirth.CalculateAge();
     }

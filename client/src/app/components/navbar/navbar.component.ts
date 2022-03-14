@@ -20,6 +20,7 @@ export class NavbarComponent implements OnInit {
   login(){
     this.accountService.login(this.creds).subscribe(() => {
       this.router.navigateByUrl('/members');
+      this.creds = { username: '', password: '' };
     })
   }
 

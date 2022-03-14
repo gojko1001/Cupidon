@@ -84,7 +84,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   onTabActivated(data: TabDirective){
     this.activeTab = data;
     if(this.activeTab.heading === 'Messages'){
-      this.messageService.createHubConnection(this.user, this.member.username);   
+      this.messageService.createHubConnection(this.member.username);   
     } else {
       this.messageService.stopHubConnection();
     }

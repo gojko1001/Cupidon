@@ -38,6 +38,11 @@ namespace DatingApp.Data
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
 
+            builder.Entity<RefreshToken>()
+                .HasOne(r => r.User)
+                .WithMany(u => u.RefreshTokens)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<UserLike>()
                 .HasKey(k => new { k.SourceUserId, k.LikedUserId });
 

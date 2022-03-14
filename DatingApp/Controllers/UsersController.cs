@@ -5,10 +5,12 @@ using DatingApp.Extensions;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DatingApp.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ControllerBase

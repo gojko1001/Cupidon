@@ -47,13 +47,7 @@ namespace DatingApp.Controllers
             if (!roleResult.Succeeded)
                 return BadRequest(result.Errors);
 
-            return new UserDto
-            {
-                Username = user.UserName,
-                Token = await _tokenService.CreateToken(user),
-                KnownAs = registerDto.KnownAs,
-                Gender = user.Gender
-            };
+            return await GetReturnUserDto(user);
         }
 
         [HttpPost("login")]
@@ -61,6 +55,7 @@ namespace DatingApp.Controllers
         {
             var user = await _userManager.Users
                 .Include(p => p.Photos)
+                .Include(u => u.RefreshTokens)
                 .SingleOrDefaultAsync(u => u.UserName == loginDto.Username.ToLower());
 
             if(user == null)
@@ -70,14 +65,16 @@ namespace DatingApp.Controllers
             if(!result.Succeeded)
                 return Unauthorized("Invalid username or password!");
 
-            return new UserDto
-            {
-                Username = user.UserName,
-                Token = await _tokenService.CreateToken(user),
-                ProfilePhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain)?.Url,
-                KnownAs = user.KnownAs,
-                Gender = user.Gender
-            };
+            var returnUser = await GetReturnUserDto(user);
+            returnUser.ProfilePhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain)?.Url;
+            return returnUser;
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<RefreshTokenDto>> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
+        {
+            refreshTokenDto.AccessToken = HttpContext.Request.Headers.Authorization.ToString().Substring(7);
+            return Ok(await _tokenService.RenewTokens(refreshTokenDto));
         }
 
         [Authorize]
@@ -103,5 +100,15 @@ namespace DatingApp.Controllers
         }
 
         private async Task<bool> UserExists(string username) => await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());
+
+        private async Task<UserDto> GetReturnUserDto(AppUser user)
+            => new UserDto
+            {
+                Username = user.UserName,
+                Token = await _tokenService.GenerateJwtToken(user),
+                RefreshToken = _tokenService.GenerateRefreshToken(user),
+                KnownAs = user.KnownAs,
+                Gender = user.Gender
+            };
     }
 }

@@ -6,8 +6,8 @@ import { take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Group } from '../model/group';
 import { Message } from '../model/message';
-import { User } from '../model/user';
 import { getPaginatedResult, getPaginationHeaders } from './paginationUtil';
+import { getAccessToken } from './tokenUtil';
 
 @Injectable({
   providedIn: 'root'
@@ -21,15 +21,15 @@ export class MessageService {
 
   constructor(private http: HttpClient) { }
 
-  createHubConnection(user: User, otherUsername: string){
+  createHubConnection(otherUsername: string){
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.messageHubUrl + "?user=" + otherUsername, {
-        accessTokenFactory: () => user.token
+        accessTokenFactory: () => getAccessToken()
       })
       .withAutomaticReconnect()
       .build();
     
-    this.hubConnection.start().catch(error => console.log(error));
+    this.hubConnection.start().catch(error => {console.log(error)});
 
     this.hubConnection.on("ReceiveMessageThread", messages => {
       this.messageThreadSource.next(messages);

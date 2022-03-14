@@ -36,7 +36,8 @@ namespace DatingApp.Extensions
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        ClockSkew = TimeSpan.Zero
                     };
 
                     opt.Events = new JwtBearerEvents
@@ -50,6 +51,16 @@ namespace DatingApp.Extensions
                                 context.Token = accessToken;
                             }
 
+                            return Task.CompletedTask;
+                        },
+
+                        OnAuthenticationFailed = context =>
+                        {
+                            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                            {
+                                context.Response.Headers.Add("Token-Expired", "true");
+                                context.Response.Headers.Add("Access-Control-Expose-Headers", "Token-Expired");
+                            }
                             return Task.CompletedTask;
                         }
                     };

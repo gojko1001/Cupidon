@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { User } from '../model/user';
+import { getAccessToken } from './tokenUtil';
 
 @Injectable({
   providedIn: 'root'
@@ -19,10 +19,10 @@ export class PresenceService {
   constructor(private toastr: ToastrService,
               private router: Router) { }
 
-  createHubConnection(user: User){
+  createHubConnection(){
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.presenceUrl, {
-        accessTokenFactory: () => user.token
+        accessTokenFactory: () => getAccessToken()
       })
       .withAutomaticReconnect()
       .build();

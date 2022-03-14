@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment';
 import { User } from '../model/user';
 import { PresenceService } from './presence.service';
+import { getDecodedToken, setAccessToken, setRefreshToken, signOut } from './tokenUtil';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class AccountService {
       map((user: User) => {
         if(user){
           this.setCurrentUser(user);
-          this.presence.createHubConnection(user);
+          this.presence.createHubConnection();
         }
       })
     )
@@ -34,7 +35,7 @@ export class AccountService {
       map((user: User) => {
         if(user) {
           this.setCurrentUser(user);
-          this.presence.createHubConnection(user);
+          this.presence.createHubConnection();
         }
       })
     )
@@ -42,16 +43,19 @@ export class AccountService {
 
   setCurrentUser(user: User){
     user.roles = [];
-    const roles = this.getDecodedToken(user.token).role;
+    const roles = getDecodedToken(user.token).role;
     Array.isArray(roles) ? user.roles = roles : user.roles.push(roles);
 
-    localStorage.setItem('user', JSON.stringify(user));
+    let userInfo = {username: user.username, knownAs: user.knownAs, profilePhotoUrl: user.profilePhotoUrl, gender: user.gender, roles: user.roles}
+    localStorage.setItem('user', JSON.stringify(userInfo));
+    setAccessToken(user.token)
+    setRefreshToken(user.refreshToken)
     this.currentUserSource.next(user);
     
   }
 
   logout(){
-    localStorage.removeItem('user');
+    signOut();
     this.currentUserSource.next(null);
     this.presence.stopHubConnection();
   }
@@ -60,7 +64,7 @@ export class AccountService {
     return this.http.put(this.accountUrl + "update-password", passwordChange);
   }
 
-  getDecodedToken(token: string){
-    return JSON.parse(atob(token.split('.')[1]));
+  refreshToken(token: string){
+    return this.http.post(this.accountUrl + "refresh-token", {refreshToken: token});
   }
 }

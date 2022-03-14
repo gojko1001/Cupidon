@@ -3,22 +3,28 @@ import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor
+  HttpInterceptor,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { NavigationExtras, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
+import { catchError, filter, finalize, switchMap, take } from 'rxjs/operators';
+import { AccountService } from '../services/account.service';
+import { getRefreshToken, setAccessToken, setRefreshToken } from '../services/tokenUtil';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
+  private refreshInProgress = false;
+  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(private router: Router,
-              private toastr: ToastrService) {}
+              private toastr: ToastrService,
+              private accountService: AccountService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
         if (error) {
           switch (error.status) {
             case 400:
@@ -31,13 +37,46 @@ export class ErrorInterceptor implements HttpInterceptor {
                 }
                 throw modalStateErrors.flat();
               } else if (typeof(error.error) === 'object'){
-                this.toastr.error(error.statusText, error.status);
+                this.toastr.error(error.statusText, error.status.toString());
               } else {
-                this.toastr.error(error.error, error.status)
+                this.toastr.error(error.error, error.status.toString())
               }
               break;
             case 401:
-              this.toastr.error(error.error, error.status);
+              if(error.headers.get('Token-Expired')){
+                if(this.refreshInProgress){
+                  return this.refreshTokenSubject.pipe(
+                    filter((res) => res),
+                    take(1),
+                    switchMap(() => next.handle(request))
+                  );
+                } else {
+                  this.refreshInProgress = true;
+                  this.refreshTokenSubject.next(null);
+
+                  return this.accountService.refreshToken(getRefreshToken()).pipe(
+                    switchMap((token: any) => {
+                      setRefreshToken(token.refreshToken);
+                      setAccessToken(token.accessToken);
+                      this.refreshTokenSubject.next(token.accessToken);
+                      return next.handle(request);
+                    }),
+                    catchError(err => {
+                      this.accountService.logout();
+                      this.router.navigateByUrl('/');
+                      return throwError(err);
+                    }),
+                    finalize(() => (this.refreshInProgress = false))
+                  );
+                }
+              } else {
+                if(localStorage.getItem('user')){       // To prevent trying to close closed presence hub connection
+                  this.accountService.logout();
+                  this.router.navigateByUrl('/');
+                }else{
+                  this.toastr.error(error.error, error.status.toString());
+                }
+              }
               break;
             case 404:
               this.router.navigateByUrl('/not-found');

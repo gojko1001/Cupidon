@@ -2,7 +2,8 @@ import { Photo } from "./photo";
 
 export interface User {
     username: string;
-    token: string;
+    token?: string;
+    refreshToken?: string;
     profilePhotoUrl: string;
     knownAs: string;
     gender: string;

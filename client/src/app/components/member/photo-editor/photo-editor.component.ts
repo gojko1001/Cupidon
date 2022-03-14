@@ -5,6 +5,7 @@ import { Photo } from 'src/app/model/photo';
 import { Member, User } from 'src/app/model/user';
 import { AccountService } from 'src/app/services/account.service';
 import { MembersService } from 'src/app/services/members.service';
+import { getAccessToken } from 'src/app/services/tokenUtil';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -55,7 +56,7 @@ export class PhotoEditorComponent implements OnInit {
   initilizeUploader(){
     this.uploader = new FileUploader({
       url: this.usersUrl + 'add-photo',
-      authToken: 'Bearer ' + this.user.token,
+      authToken: 'Bearer ' + getAccessToken(),
       isHTML5: true,
       allowedFileType: ['image'],
       removeAfterUpload: true,
