@@ -25,6 +25,8 @@ namespace DatingApp.Repository
 
         public IGroupRepository GroupRepository => new GroupRepository(_context);
 
+        public IRefreshTokenRepository RefreshTokenRepository => new RefreshTokenRepository(_context);
+
         public async Task<bool> Complete()
         {
             return await _context.SaveChangesAsync() > 0;

@@ -23,6 +23,7 @@ namespace DatingApp.Extensions
             services.AddScoped<IPhotoService, PhotoService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            services.AddHostedService<TokenRemovalService>();
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
             return services;
         }

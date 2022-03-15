@@ -1,7 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DatingApp.Entities
 {
+    [Table("RefreshToken")]
     public class RefreshToken
     {
         [Key]

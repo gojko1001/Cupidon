@@ -21,6 +21,7 @@ namespace DatingApp.Data
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Connection> Connections { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -28,14 +29,14 @@ namespace DatingApp.Data
 
             builder.Entity<AppUser>()
                 .HasMany(u => u.Roles)
-                .WithOne(u => u.User)
-                .HasForeignKey(u => u.UserId)
+                .WithOne(ur => ur.User)
+                .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
 
             builder.Entity<AppRole>()
                 .HasMany(r => r.Roles)
-                .WithOne(r => r.Role)
-                .HasForeignKey(u => u.RoleId)
+                .WithOne(ur => ur.Role)
+                .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
 
             builder.Entity<RefreshToken>()
