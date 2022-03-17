@@ -27,11 +27,37 @@ namespace DatingApp.Middleware
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
 
-                var response = _env.IsDevelopment()
-                    ? new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString())
-                    : new ApiException(context.Response.StatusCode, "Internal Server Error");
+                switch (ex)
+                {
+                    case InvalidActionException:
+                        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
+                        break;
+                    case UnauthorizedException:
+                        context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
+                        break;
+                    case NotFoundException:
+                        context.Response.StatusCode = (int) HttpStatusCode.NotFound;
+                        break;
+                    default:
+                        context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                        break;
+                }
+
+                ApiException response;
+                if (_env.IsDevelopment() && context.Response.StatusCode == 500)
+                {
+                    response = new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString());
+                } 
+                else if (context.Response.StatusCode == (int)HttpStatusCode.InternalServerError)
+                {
+                    response = new ApiException(context.Response.StatusCode, "Internal Server Error");
+                } 
+                else
+                {
+                    var a = ex as InvalidActionException;
+                    response = new ApiException(context.Response.StatusCode, ex.Message);
+                }
 
                 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 

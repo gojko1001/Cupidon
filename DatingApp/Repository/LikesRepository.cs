@@ -50,11 +50,11 @@ namespace DatingApp.Repository
             return await PagedList<LikeDto>.CreateAsync(likedUsers, likesParams.PageNumber, likesParams.PageSize);
         }
 
-        public async Task<AppUser> GetUserWithLikes(int userId)
+        public async Task<AppUser> GetUserWithLikes(string username)
         {
             return await _context.Users
                 .Include(u => u.LikedUsers)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+                .FirstOrDefaultAsync(u => u.UserName == username);
         }
     }
 }

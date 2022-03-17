@@ -21,6 +21,7 @@ namespace DatingApp.Extensions
             });
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<ILikeService, LikeService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddHostedService<TokenRemovalService>();
