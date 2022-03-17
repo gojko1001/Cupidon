@@ -25,7 +25,7 @@ namespace DatingApp.Repository
             _context.Messages.Add(message);
         }
 
-        public void DeleteMessage(Message message)
+        public void RemoveMessage(Message message)
         {
             _context.Messages.Remove(message);
         }
@@ -53,9 +53,9 @@ namespace DatingApp.Repository
             return await PagedList<MessageDto>.CreateAsync(query, messageParams.PageNumber, messageParams.PageSize);
         }
 
-        public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
+        public async Task<IEnumerable<Message>> GetMessageThread(string currentUsername, string recipientUsername)
         {
-            var messages = await _context.Messages
+            return await _context.Messages
                 .Include(m => m.Sender).ThenInclude(u => u.Photos)
                 .Include(m => m.Recipient).ThenInclude(u => u.Photos)
                 .Where(m => m.Recipient.UserName == currentUsername && !m.RecipientDeleted &&
@@ -64,17 +64,6 @@ namespace DatingApp.Repository
                         m.Sender.UserName == currentUsername)
                 .OrderBy(m => m.DateSent)
                 .ToListAsync();
-
-            var unreadMessages = messages.Where(m => m.DateRead == null && 
-                                                m.RecipientUsername == currentUsername).ToList();
-            if (unreadMessages.Any())
-            {
-                foreach(var message in unreadMessages)
-                {
-                    message.DateRead = DateTime.UtcNow;
-                }
-            }
-            return _mapper.Map<IEnumerable<MessageDto>>(messages);
         }
     }
 }

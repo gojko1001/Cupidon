@@ -3,6 +3,7 @@ using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Extensions;
 using DatingApp.Repository.Interfaces;
+using DatingApp.Services.interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -12,17 +13,14 @@ namespace DatingApp.SignalR
     public class MessageHub : Hub
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMessageService _messageService;
         private readonly IMapper _mapper;
-        private readonly IHubContext<PresenceHub> _presenceHub;
-        private readonly PresenceTracker _tracker;
 
-        public MessageHub(IUnitOfWork unitOfWork, IMapper mapper,
-            IHubContext<PresenceHub> presenceHub, PresenceTracker tracker)
+        public MessageHub(IUnitOfWork unitOfWork, IMessageService messageService, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _messageService = messageService;
             _mapper = mapper;
-            _presenceHub = presenceHub;
-            _tracker = tracker;
         }
 
         public override async Task OnConnectedAsync()
@@ -35,10 +33,7 @@ namespace DatingApp.SignalR
             var group = await AddToGroup(groupName);
             await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
 
-            var messages = await _unitOfWork.MessageRepository.GetMessageThread(caller, otherUser);
-
-            if (_unitOfWork.HasChanges())
-                await _unitOfWork.Complete();
+            var messages = await _messageService.GetMessageThread(caller, otherUser);
 
             await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
         }
@@ -55,51 +50,17 @@ namespace DatingApp.SignalR
             if (createMessageDto.Content == null)
                 throw new HubException("Message is empty");
 
-            var sender = await _unitOfWork.UserRepository.GetByIdAsync(Context.User.GetId());
-
-            if (sender.UserName == createMessageDto.RecipientUsername.ToLower())
+            var senderUsername = Context.User.GetUsername();
+            if (senderUsername == createMessageDto.RecipientUsername)
                 throw new HubException("Can't send a message to yourself");
 
-            var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
+            createMessageDto.SenderUsername = senderUsername;
 
-            if (recipient == null)
-                throw new HubException("Not Found user");
-
-            var message = new Message
-            {
-                SenderId = sender.Id,
-                SenderUsername = sender.UserName,
-                RecipientId = recipient.Id,
-                RecipientUsername = recipient.UserName,
-                Content = createMessageDto.Content
-            };
-
-            var groupName = GetGroupName(sender.UserName, recipient.UserName);
-            var group = await _unitOfWork.GroupRepository.GetMessageGroup(groupName);
-            if(group.Connections.Any(x => x.Username == recipient.UserName))
-            {
-                message.DateRead = DateTime.UtcNow;
-            }
-            else
-            {
-                var connections = await _tracker.GetConnectionsForUser(recipient.UserName);
-                if(connections != null)
-                {
-                    await _presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived", new {
-                        username = sender.UserName,
-                        knownAs = sender.KnownAs,
-                        content = message.Content
-                    });
-                }
-            }
-            
-            _unitOfWork.MessageRepository.AddMessage(message);
-            if (await _unitOfWork.Complete())
-            {
-                await Clients.Group(groupName).SendAsync("NewMessage", _mapper.Map<MessageDto>(message));
-            }
+            var message = await _messageService.SendMessage(createMessageDto);
+            if(message != null)
+                await Clients.Group(GetGroupName(senderUsername, createMessageDto.RecipientUsername))
+                    .SendAsync("NewMessage", _mapper.Map<MessageDto>(message));
         }
-
 
         private async Task<Group> AddToGroup(string groupName)
         {
@@ -129,11 +90,11 @@ namespace DatingApp.SignalR
             throw new HubException("Failed to remove from group");
         }
 
+
         private static string GetGroupName(string caller, string other)
         {
             var stringCompare = string.Compare(caller, other) < 0;
             return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
-           
         }
     }
 }

@@ -28,22 +28,13 @@ namespace DatingApp.Middleware
                 _logger.LogError(ex, ex.Message);
                 context.Response.ContentType = "application/json";
 
-                switch (ex)
+                context.Response.StatusCode = ex switch
                 {
-                    case InvalidActionException:
-                        context.Response.StatusCode = (int) HttpStatusCode.BadRequest;
-                        break;
-                    case UnauthorizedException:
-                        context.Response.StatusCode = (int) HttpStatusCode.Unauthorized;
-                        break;
-                    case NotFoundException:
-                        context.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                        break;
-                    default:
-                        context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                        break;
-                }
-
+                    InvalidActionException  => (int)HttpStatusCode.BadRequest,
+                    UnauthorizedException   => (int)HttpStatusCode.Unauthorized,
+                    NotFoundException       => (int)HttpStatusCode.NotFound,
+                    _                       => (int)HttpStatusCode.InternalServerError,
+                };
                 ApiException response;
                 if (_env.IsDevelopment() && context.Response.StatusCode == 500)
                 {
@@ -55,7 +46,6 @@ namespace DatingApp.Middleware
                 } 
                 else
                 {
-                    var a = ex as InvalidActionException;
                     response = new ApiException(context.Response.StatusCode, ex.Message);
                 }
 
