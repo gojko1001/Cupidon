@@ -4,7 +4,7 @@ using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 
 namespace DatingApp.Services
 {

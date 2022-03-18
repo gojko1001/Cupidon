@@ -2,7 +2,7 @@
 using DatingApp.DTOs;
 using DatingApp.Extensions;
 using DatingApp.Services.interfaces;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

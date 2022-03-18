@@ -1,4 +1,4 @@
-﻿namespace DatingApp.Utils
+﻿namespace DatingApp.Utils.Pagination
 {
     public class MessageParams : PaginationParams
     {

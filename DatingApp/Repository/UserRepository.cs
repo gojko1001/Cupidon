@@ -4,7 +4,7 @@ using DatingApp.Data;
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Repository.Interfaces;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace DatingApp.Repository

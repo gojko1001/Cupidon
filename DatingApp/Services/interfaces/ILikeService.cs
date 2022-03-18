@@ -1,5 +1,5 @@
 ﻿using DatingApp.DTOs;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 
 namespace DatingApp.Services.interfaces
 {

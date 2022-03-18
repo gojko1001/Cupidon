@@ -5,7 +5,7 @@ using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.SignalR;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 using Microsoft.AspNetCore.SignalR;
 
 namespace DatingApp.Services
