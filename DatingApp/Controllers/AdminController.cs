@@ -79,11 +79,11 @@ namespace DatingApp.Controllers
             {
                 var result = await _photoService.DeletePhotoAsync(photo.PublicId);
                 if(result.Error == null)
-                    _unitOfWork.PhotoRepository.DeletePhoto(photo);
+                    _unitOfWork.PhotoRepository.RemovePhoto(photo);
             }
             else
             {
-                _unitOfWork.PhotoRepository.DeletePhoto(photo);
+                _unitOfWork.PhotoRepository.RemovePhoto(photo);
             }
 
             if(await _unitOfWork.Complete())

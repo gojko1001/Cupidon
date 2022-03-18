@@ -25,10 +25,6 @@ namespace DatingApp.Repository
             .Include(p => p.Photos)
             .ToListAsync();
 
-        public async Task<AppUser> GetByIdAsync(int id) 
-            => await _context.Users
-            .Include(p => p.Photos)
-            .SingleOrDefaultAsync(u => u.Id == id);
 
         public async Task<MemberDto> GetMemberAsync(string username, bool isCurrentUser)
         {
@@ -60,6 +56,11 @@ namespace DatingApp.Repository
                 _mapper.ConfigurationProvider).AsNoTracking(),
                 userParams.PageNumber, userParams.PageSize);
         }
+
+        public async Task<AppUser> GetUserByIdAsync(int id) 
+            => await _context.Users
+            .Include(p => p.Photos)
+            .SingleOrDefaultAsync(u => u.Id == id);
 
         public async Task<AppUser> GetUserByPhotoIdAsync(int photoId)
         {
