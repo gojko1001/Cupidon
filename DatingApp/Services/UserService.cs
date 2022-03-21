@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DatingApp.DTOs;
-using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
@@ -11,13 +10,11 @@ namespace DatingApp.Services
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IPhotoService _photoService;
         private readonly IMapper _mapper;
 
-        public UserService(IUnitOfWork unitOfWork, IPhotoService photoService, IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _photoService = photoService;
             _mapper = mapper;
         }
 
@@ -47,71 +44,5 @@ namespace DatingApp.Services
             throw new InvalidActionException("Failed to update user info");
         }
 
-
-        public async Task<Photo> AddPhoto(IFormFile file, int userId)
-        {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
-
-            var result = await _photoService.AddPhotoAsync(file);
-            if (result.Error != null)
-                throw new InvalidActionException(result.Error.Message);
-
-            var photo = new Photo
-            {
-                Url = result.SecureUrl.AbsoluteUri,
-                PublicId = result.PublicId
-            };
-
-            user.Photos.Add(photo);
-
-            if (await _unitOfWork.Complete())
-            {
-                return photo;
-            }
-
-            throw new InvalidActionException("Error while adding new photo!");
-        }
-
-        public async Task SetMainPhoto(int photoId, int userId)
-        {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
-            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
-
-            if (photo.IsMain)
-                throw new InvalidActionException("This is already your main photo");
-
-            var currentMain = user.Photos.FirstOrDefault(p => p.IsMain);
-
-            if (currentMain != null)
-                currentMain.IsMain = false;
-            photo.IsMain = true;
-
-            if (await _unitOfWork.Complete())
-                return;
-            throw new InvalidActionException("Failed to set main photo");
-        }
-
-        public async Task RemovePhoto(int photoId)
-        {
-            var user = await _unitOfWork.UserRepository.GetUserByPhotoIdAsync(photoId);
-
-            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
-
-            if (photo == null)
-                throw new NotFoundException();
-            if (photo.IsMain)
-                throw new InvalidActionException("You cannot delete your main photo");
-
-            if (photo.PublicId != null)
-            {
-                var result = await _photoService.DeletePhotoAsync(photo.PublicId);
-                if (result.Error != null)
-                    throw new InvalidActionException(result.Error.Message);
-            }
-            user.Photos.Remove(photo);
-            if (await _unitOfWork.Complete())
-                return;
-            throw new InvalidActionException("Failed to delete photo");
-        }
     }
 }

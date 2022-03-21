@@ -14,11 +14,13 @@ namespace DatingApp.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IPhotoService _photoService;
         private readonly IMapper _mapper;
 
-        public UsersController(IUserService userService, IMapper mapper)
+        public UsersController(IUserService userService, IPhotoService photoService, IMapper mapper)
         {
             _userService = userService;
+            _photoService = photoService;
             _mapper = mapper;
         }
 
@@ -40,7 +42,7 @@ namespace DatingApp.Controllers
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-            var photo = await _userService.AddPhoto(file, User.GetId());
+            var photo = await _photoService.AddPhoto(file, User.GetId());
             if(photo != null)
             {
                 return CreatedAtRoute("GetUser", new { Username = User.GetUsername() }, _mapper.Map<PhotoDto>(photo));
@@ -58,14 +60,14 @@ namespace DatingApp.Controllers
         [HttpPut("set-main-photo/{photoId}")]
         public async Task<ActionResult> SetMainPhoto(int photoId)
         {
-            await _userService.SetMainPhoto(photoId, User.GetId());
+            await _photoService.SetMainPhoto(photoId, User.GetId());
             return NoContent();
         }
 
         [HttpDelete("delete-photo/{photoId}")]
         public async Task<ActionResult> RemovePhoto(int photoId)
         {
-            await _userService.RemovePhoto(photoId);
+            await _photoService.RemovePhoto(photoId, User.GetId());
             return Ok();
         }
     }

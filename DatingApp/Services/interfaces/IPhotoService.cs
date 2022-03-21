@@ -1,10 +1,15 @@
-﻿using CloudinaryDotNet.Actions;
+﻿using DatingApp.DTOs;
+using DatingApp.Entities;
 
 namespace DatingApp.Services.interfaces
 {
     public interface IPhotoService
     {
-        Task<ImageUploadResult> AddPhotoAsync(IFormFile file);
-        Task<DeletionResult> DeletePhotoAsync(string publicId);
+        Task<Photo> AddPhoto(IFormFile file, int userId);
+        Task SetMainPhoto(int photoId, int userId);
+        Task RemovePhoto(int photoId, int userId);
+        Task<IEnumerable<PhotoForApprovalDto>> GetUnapprovedPhotos();
+        Task ApprovePhoto(int photoId);
+        Task RejectPhoto(int photoId);
     }
 }

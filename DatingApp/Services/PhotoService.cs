@@ -1,49 +1,135 @@
-﻿using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
+﻿using DatingApp.DTOs;
+using DatingApp.Entities;
+using DatingApp.Errors;
+using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils;
-using Microsoft.Extensions.Options;
 
 namespace DatingApp.Services
 {
     public class PhotoService : IPhotoService
     {
-        private readonly Cloudinary _cloduinary;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly CloudinaryService _cloudinaryService;
 
-        public PhotoService(IOptions<CloudinarySettings> conf)
+        public PhotoService(IUnitOfWork unitOfWork, CloudinaryService cloudinaryService)
         {
-            var acc = new Account
-            (
-                conf.Value.CloudName,
-                conf.Value.ApiKey,
-                conf.Value.ApiSecret
-            );
-
-            _cloduinary = new Cloudinary(acc);
+            _unitOfWork = unitOfWork;
+            _cloudinaryService = cloudinaryService;
         }
 
-        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+        public async Task<Photo> AddPhoto(IFormFile file, int userId)
         {
-            var uploadResult = new ImageUploadResult();
-            if(file.Length > 0)
+            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+
+            var result = await _cloudinaryService.AddPhotoAsync(file);
+            if (result.Error != null)
+                throw new InvalidActionException(result.Error.Message);
+
+            var photo = new Photo
             {
-                await using var stream = file.OpenReadStream();
-                var uploadParams = new ImageUploadParams
-                {
-                    File = new FileDescription(file.FileName, stream),
-                    Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face")
-                };
-                uploadResult = await _cloduinary.UploadAsync(uploadParams);
+                Url = result.SecureUrl.AbsoluteUri,
+                PublicId = result.PublicId
+            };
+
+            user.Photos.Add(photo);
+
+            if (await _unitOfWork.Complete())
+            {
+                return photo;
             }
 
-            return uploadResult;
+            throw new InvalidActionException("Error while adding new photo!");
         }
 
-        public async Task<DeletionResult> DeletePhotoAsync(string publicId)
+        public async Task SetMainPhoto(int photoId, int userId)
         {
-            var deleteParams = new DeletionParams(publicId);
+            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
+            
+            if(photo == null)
+                throw new NotFoundException();
+            if (!photo.IsApproved)
+                throw new InvalidActionException("Photo has not been approved yet");
+            if (photo.IsMain)
+                throw new InvalidActionException("This is already your main photo");
 
-            return await _cloduinary.DestroyAsync(deleteParams);
+            var currentMain = user.Photos.FirstOrDefault(p => p.IsMain);
+
+            if (currentMain != null)
+                currentMain.IsMain = false;
+            photo.IsMain = true;
+
+            if (await _unitOfWork.Complete())
+                return;
+            throw new InvalidActionException("Failed to set main photo");
+        }
+
+        public async Task RemovePhoto(int photoId, int userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
+
+            if (photo == null)
+                throw new NotFoundException();
+            if (photo.IsMain)
+                throw new InvalidActionException("You cannot delete your main photo");
+
+            if (photo.PublicId != null)
+            {
+                var result = await _cloudinaryService.DeletePhotoAsync(photo.PublicId);
+                if (result.Error != null)
+                    throw new InvalidActionException(result.Error.Message);
+            }
+            user.Photos.Remove(photo);
+            if (await _unitOfWork.Complete())
+                return;
+            throw new InvalidActionException("Failed to delete photo");
+        }
+
+        public Task<IEnumerable<PhotoForApprovalDto>> GetUnapprovedPhotos()
+        {
+            return _unitOfWork.PhotoRepository.GetUnapprovedPhotos();
+        }
+
+        public async Task ApprovePhoto(int photoId)
+        {
+            var photo = await _unitOfWork.PhotoRepository.GetPhotoByIdAsync(photoId);
+            if (photo == null)
+                throw new NotFoundException("Photo not found");
+
+            photo.IsApproved = true;
+            
+            var user = await _unitOfWork.UserRepository.GetUserByPhotoIdAsync(photoId);
+            if(user != null && !user.Photos.Any(p => p.IsMain))
+            {
+                photo.IsMain = true;
+            }
+
+            if(await _unitOfWork.Complete())
+                return;
+            throw new InvalidActionException("Failed to approve photo");
+        }
+
+        public async Task RejectPhoto(int photoId)
+        {
+            var photo = await _unitOfWork.PhotoRepository.GetPhotoByIdAsync(photoId);
+            if (photo == null)
+                throw new NotFoundException("Photo not found");
+            if (photo.PublicId != null)
+            {
+                var result = await _cloudinaryService.DeletePhotoAsync(photo.PublicId);
+                if (result.Error == null)
+                    _unitOfWork.PhotoRepository.RemovePhoto(photo);
+            }
+            else
+            {
+                _unitOfWork.PhotoRepository.RemovePhoto(photo);
+            }
+
+            if (await _unitOfWork.Complete())
+                return;
+            throw new InvalidActionException("Failed to delete photo");
         }
     }
 }

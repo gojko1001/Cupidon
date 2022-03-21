@@ -24,10 +24,10 @@ export class AdminService {
   }
 
   approvePhoto(photoId: number){
-    return this.http.post(this.adminUrl + "/approve-photo/" + photoId, {});
+    return this.http.put(this.adminUrl + "/approve-photo/" + photoId, {});
   }
 
   rejectPhoto(photoId: number){
-    return this.http.post(this.adminUrl + "/reject-photo/" + photoId, {});
+    return this.http.delete(this.adminUrl + "/reject-photo/" + photoId);
   }
 }
