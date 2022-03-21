@@ -53,7 +53,8 @@ namespace DatingApp.Services
                 Token = GenerateRefreshToken(),
                 Expiration = DateTime.UtcNow.AddDays(7)
             };
-
+            if(user.RefreshTokens == null)
+                user.RefreshTokens = new List<RefreshToken>();
             user.RefreshTokens.Add(refreshToken);
             _userManager.UpdateAsync(user);
 

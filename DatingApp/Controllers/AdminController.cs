@@ -1,8 +1,5 @@
-﻿using DatingApp.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using DatingApp.DTOs;
 using DatingApp.Services.interfaces;
 
@@ -12,12 +9,12 @@ namespace DatingApp.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly IUserService _userService;
         private readonly IPhotoService _photoService;
 
-        public AdminController(UserManager<AppUser> userManager, IPhotoService photoService)
+        public AdminController(IUserService userService, IPhotoService photoService)
         {
-            _userManager = userManager;
+            _userService = userService;
             _photoService = photoService;
         }
 
@@ -25,16 +22,7 @@ namespace DatingApp.Controllers
         [HttpGet("users-with-roles")]
         public async Task<ActionResult> GetUsersWithRole()
         {
-           return Ok(await _userManager.Users
-                        .Include(r => r.Roles).ThenInclude(r => r.Role)
-                        .OrderBy(u => u.UserName)
-                        .Select(u => new
-                        {
-                            u.Id,
-                            Username = u.UserName,
-                            Roles = u.Roles.Select(r => r.Role.Name).ToList()
-                        })
-                        .ToListAsync());
+           return Ok(await _userService.GetUsersWithRole());
         }
 
         [Authorize(Policy = "ModeratePhotoRole")]
@@ -67,21 +55,7 @@ namespace DatingApp.Controllers
         {
             var selectedRoles = roles.Split(',').ToArray();
 
-            var user = await _userManager.FindByNameAsync(username);
-            if (user == null)
-                return BadRequest("User doesn't exist");
-
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            var result = await _userManager.AddToRolesAsync(user, selectedRoles.Except(userRoles));
-            if (!result.Succeeded)
-                return BadRequest("Failed to add to roles");
-            
-            result = await _userManager.RemoveFromRolesAsync(user, userRoles.Except(selectedRoles));
-            if (!result.Succeeded)
-                return BadRequest("Failed to remove from roles");
-
-            return Ok(await _userManager.GetRolesAsync(user));
+            return Ok(await _userService.EditRoles(username, selectedRoles));
         }
     }
 }

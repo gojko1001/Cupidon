@@ -50,7 +50,7 @@ export class AccountService {
     localStorage.setItem('user', JSON.stringify(userInfo));
     setAccessToken(user.token)
     setRefreshToken(user.refreshToken)
-    this.currentUserSource.next(user);
+    this.currentUserSource.next(userInfo);
     
   }
 
