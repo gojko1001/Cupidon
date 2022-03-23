@@ -4,7 +4,7 @@ using DatingApp.Data;
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Repository.Interfaces;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace DatingApp.Repository
@@ -25,10 +25,6 @@ namespace DatingApp.Repository
             .Include(p => p.Photos)
             .ToListAsync();
 
-        public async Task<AppUser> GetByIdAsync(int id) 
-            => await _context.Users
-            .Include(p => p.Photos)
-            .SingleOrDefaultAsync(u => u.Id == id);
 
         public async Task<MemberDto> GetMemberAsync(string username, bool isCurrentUser)
         {
@@ -61,14 +57,23 @@ namespace DatingApp.Repository
                 userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<AppUser> GetUserByPhotoIdAsync(int photoId)
+        public async Task<AppUser> GetUserByIdAsync(int id, bool isCurrentUser)
         {
-            return await _context.Users
+            var query = _context.Users
+                       .Include(p => p.Photos)
+                       .AsQueryable();
+            if(isCurrentUser)
+                query = query.IgnoreQueryFilters();
+            return await query
+                       .SingleOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<AppUser> GetUserByPhotoIdAsync(int photoId) 
+            => await _context.Users
                 .Include(u => u.Photos)
                 .Where(u => u.Photos.Any(p => p.Id == photoId))
                 .IgnoreQueryFilters()
                 .SingleOrDefaultAsync();
-        }
 
         public async Task<AppUser> GetUserByUsernameAsync(string username) 
             => await _context.Users

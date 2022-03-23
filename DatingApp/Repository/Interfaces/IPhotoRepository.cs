@@ -7,6 +7,6 @@ namespace DatingApp.Repository.Interfaces
     {
         Task<Photo> GetPhotoByIdAsync(int id);
         Task<IEnumerable<PhotoForApprovalDto>> GetUnapprovedPhotos();
-        void DeletePhoto(Photo photo);
+        void RemovePhoto(Photo photo);
     }
 }

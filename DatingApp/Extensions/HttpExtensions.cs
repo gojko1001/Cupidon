@@ -1,4 +1,4 @@
-﻿using DatingApp.Utils;
+﻿using DatingApp.Utils.Pagination;
 using System.Text.Json;
 
 namespace DatingApp.Extensions

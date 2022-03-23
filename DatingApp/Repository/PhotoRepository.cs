@@ -15,12 +15,6 @@ namespace DatingApp.Repository
             _context = context;
         }
 
-        public void DeletePhoto(Photo photo)
-        {
-            _context.Photos.Remove(photo);
-        }
-
-
         public async Task<Photo> GetPhotoByIdAsync(int id)
         {
             return await _context.Photos
@@ -41,6 +35,11 @@ namespace DatingApp.Repository
                 })
                 .IgnoreQueryFilters()
                 .ToListAsync();
+        }
+
+        public void RemovePhoto(Photo photo)
+        {
+            _context.Photos.Remove(photo);
         }
     }
 }

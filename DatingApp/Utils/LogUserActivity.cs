@@ -16,7 +16,7 @@ namespace DatingApp.Utils
                 return;
             var unitOfWork = resultContext.HttpContext.RequestServices.GetService<IUnitOfWork>();
             var id = resultContext.HttpContext.User.GetId();
-            var user = await unitOfWork.UserRepository.GetByIdAsync(id);
+            var user = await unitOfWork.UserRepository.GetUserByIdAsync(id);
             user.LastActive = DateTime.UtcNow;
             await unitOfWork.Complete();
         }

@@ -1,6 +1,6 @@
 ﻿using DatingApp.DTOs;
 using DatingApp.Entities;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 
 namespace DatingApp.Repository.Interfaces
 {
@@ -8,7 +8,7 @@ namespace DatingApp.Repository.Interfaces
     {
         void Update(AppUser user);
         Task<IEnumerable<AppUser>> GetAllAsync();
-        Task<AppUser> GetByIdAsync(int id);
+        Task<AppUser> GetUserByIdAsync(int id, bool isCurrentUser = false);
         Task<AppUser> GetUserByUsernameAsync(string username);
         Task<AppUser> GetUserByPhotoIdAsync(int photoId);
         Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams);

@@ -27,11 +27,27 @@ namespace DatingApp.Middleware
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
 
-                var response = _env.IsDevelopment()
-                    ? new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString())
-                    : new ApiException(context.Response.StatusCode, "Internal Server Error");
+                context.Response.StatusCode = ex switch
+                {
+                    InvalidActionException  => (int)HttpStatusCode.BadRequest,
+                    UnauthorizedException   => (int)HttpStatusCode.Unauthorized,
+                    NotFoundException       => (int)HttpStatusCode.NotFound,
+                    _                       => (int)HttpStatusCode.InternalServerError,
+                };
+                ApiException response;
+                if (_env.IsDevelopment() && context.Response.StatusCode == 500)
+                {
+                    response = new ApiException(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString());
+                } 
+                else if (context.Response.StatusCode == (int)HttpStatusCode.InternalServerError)
+                {
+                    response = new ApiException(context.Response.StatusCode, "Internal Server Error");
+                } 
+                else
+                {
+                    response = new ApiException(context.Response.StatusCode, ex.Message);
+                }
 
                 var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 

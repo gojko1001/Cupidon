@@ -15,12 +15,16 @@ namespace DatingApp.Extensions
         {
             services.AddSingleton<PresenceTracker>();
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
+            services.AddScoped<CloudinaryService>();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlite(config.GetConnectionString("DefaultConnection"));
             });
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
+            services.AddScoped<ILikeService, LikeService>();
+            services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddHostedService<TokenRemovalService>();

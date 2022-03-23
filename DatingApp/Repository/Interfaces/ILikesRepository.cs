@@ -1,13 +1,13 @@
 ﻿using DatingApp.DTOs;
 using DatingApp.Entities;
-using DatingApp.Utils;
+using DatingApp.Utils.Pagination;
 
 namespace DatingApp.Repository.Interfaces
 {
     public interface ILikesRepository
     {
         Task<UserLike> GetUserLike(int sourceUserId, int likedUserId);
-        Task<AppUser> GetUserWithLikes(int userId);
+        Task<AppUser> GetUserWithLikes(string username);
         Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams);
     }
 }
