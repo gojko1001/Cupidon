@@ -13,15 +13,13 @@ namespace DatingApp.Services
     public class MessageService : IMessageService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
         private readonly IHubContext<PresenceHub> _presenceHub;
         private readonly PresenceTracker _tracker;
 
-        public MessageService(IUnitOfWork unitOfWork, IMapper mapper,
+        public MessageService(IUnitOfWork unitOfWork,
             IHubContext<PresenceHub> presenceHub, PresenceTracker tracker)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
             _presenceHub = presenceHub;
             _tracker = tracker;
         }
@@ -31,7 +29,7 @@ namespace DatingApp.Services
             return await _unitOfWork.MessageRepository.GetMessagesForUserAsync(messageParams);
         }
 
-        public async Task<IEnumerable<MessageDto>> GetMessageThread(string caller, string otherUser)
+        public async Task<IEnumerable<Message>> GetMessageThread(string caller, string otherUser)
         {
             var messages = await _unitOfWork.MessageRepository.GetMessageThread(caller, otherUser);
 
@@ -46,7 +44,7 @@ namespace DatingApp.Services
             }
             if (_unitOfWork.HasChanges())
                 await _unitOfWork.Complete();    
-            return _mapper.Map<IEnumerable<MessageDto>>(messages);
+            return messages;
         }
 
         public async Task<Message> SendMessage(CreateMessageDto createMessageDto)
@@ -91,7 +89,7 @@ namespace DatingApp.Services
             return message;
         }
 
-        public async Task RemoveMessage(int messageId, string username)
+        public async Task<Message> RemoveMessage(int messageId, string username)
         {
             var message = await _unitOfWork.MessageRepository.GetMessageAsync(messageId);
             if (message == null)
@@ -106,7 +104,7 @@ namespace DatingApp.Services
             if (message.SenderDeleted && message.RecipientDeleted)
                 _unitOfWork.MessageRepository.RemoveMessage(message);
             if (await _unitOfWork.Complete())
-                return;
+                return message;
             throw new InvalidActionException("Failed to delete message");
         }
 
