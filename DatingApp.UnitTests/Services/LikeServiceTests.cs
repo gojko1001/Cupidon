@@ -25,17 +25,17 @@ namespace DatingApp.UnitTests.Services
         {
             _unitOfWork = new Mock<IUnitOfWork>();
 
-            _unitOfWork.Setup(uow => uow.LikesRepository.GetUserWithLikes(SOURCE_USER)).Returns(Task.FromResult(new AppUser
+            _unitOfWork.Setup(uow => uow.LikesRepository.GetUserWithLikes(SOURCE_USER)).ReturnsAsync(new AppUser
             {
                 Id = 1,
                 UserName = "alice",
                 LikedUsers = new List<UserLike>()
-            }));
-            _unitOfWork.Setup(uow => uow.UserRepository.GetUserByUsernameAsync(LIKED_USER)).Returns(Task.FromResult(new AppUser
+            });
+            _unitOfWork.Setup(uow => uow.UserRepository.GetUserByUsernameAsync(LIKED_USER)).ReturnsAsync(new AppUser
             {
                 Id = 2,
                 UserName = "bob",
-            }));
+            });
             _likeService = new LikeService(_unitOfWork.Object);
         }
 
@@ -48,11 +48,11 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public void AddLike_LikeAlreadyLikedUser_ThrowInvalidActionException()
         {
-            _unitOfWork.Setup(uow => uow.LikesRepository.GetUserLike(1, 2)).Returns(Task.FromResult(new UserLike
+            _unitOfWork.Setup(uow => uow.LikesRepository.GetUserLike(1, 2)).ReturnsAsync(new UserLike
             {
                 LikedUserId = 1,
                 SourceUserId = 2
-            }));
+            });
 
             Assert.That(async () => await _likeService.AddLike(SOURCE_USER, LIKED_USER), Throws.Exception.TypeOf<InvalidActionException>());
         }
@@ -60,7 +60,7 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public async Task AddLike_LikeOtherUser_AddLikeRelationToDatabaseAsync()
         {
-            _unitOfWork.Setup(uow => uow.Complete()).Returns(Task.FromResult(true));
+            _unitOfWork.Setup(uow => uow.Complete()).ReturnsAsync(true);
 
             await _likeService.AddLike(SOURCE_USER, LIKED_USER);
 

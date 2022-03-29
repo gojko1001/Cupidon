@@ -10,8 +10,10 @@ namespace DatingApp.Repository.Interfaces
         Task<IEnumerable<AppUser>> GetAllAsync();
         Task<AppUser> GetUserByIdAsync(int id, bool isCurrentUser = false);
         Task<AppUser> GetUserByUsernameAsync(string username);
+        Task<AppUser> GetUserByUsernameIncludeRefreshTokens(string username);
         Task<AppUser> GetUserByPhotoIdAsync(int photoId);
         Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams);
         Task<MemberDto> GetMemberAsync(string username, bool isCurrentUser);
+        public Task<bool> UserExists(string username);
     }
 }

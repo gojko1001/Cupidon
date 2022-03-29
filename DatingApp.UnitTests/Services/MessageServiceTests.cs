@@ -49,12 +49,12 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public async Task GetMessageThread_WhenCalled_ReturnMessageThreadBetweenUsersAsync()
         {
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageThread("alice", "bob")).Returns(Task.FromResult<IEnumerable<Message>>(new List<Message>
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageThread("alice", "bob")).ReturnsAsync(new List<Message>
             {
                 new Message { Id = 1, SenderUsername = "bob", RecipientUsername = "alice" },
                 new Message { Id = 2, SenderUsername = "alice", RecipientUsername = "bob" },
                 new Message { Id = 3, SenderUsername = "bob", RecipientUsername = "alice" },
-            }));
+            });
 
             var result = (List<Message>)await _messageService.GetMessageThread("alice", "bob");
 
@@ -65,12 +65,12 @@ namespace DatingApp.UnitTests.Services
         public async Task GetMessageThread_WhenCalled_SetReadDateOfAllUnreadMessagesSentToCurrentUser()
         {
             var dateRead = new DateTime(2022, 1, 10, 14, 0, 0);
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageThread("alice", "bob")).Returns(Task.FromResult<IEnumerable<Message>>(new List<Message>
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageThread("alice", "bob")).ReturnsAsync(new List<Message>
             {
                 new Message { Id = 1, RecipientUsername = "alice"},
                 new Message { Id = 2, RecipientUsername = "bob"},
                 new Message { Id = 3, RecipientUsername = "alice", DateRead = dateRead}
-            }));
+            });
 
             var result = (List<Message>) await _messageService.GetMessageThread("alice", "bob");
 
@@ -95,7 +95,7 @@ namespace DatingApp.UnitTests.Services
         public async Task SendMessage_SendToExistingUser_ReturnSentMessageAsync()
         {
             SetUpExistingUsers();
-            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).Returns(Task.FromResult(new Group()));
+            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).ReturnsAsync(new Group());
             _unitOfWork.Setup(u => u.MessageRepository.AddMessage(It.IsAny<Message>()));
 
             var result = await _messageService.SendMessage(_createMessageDto);
@@ -109,7 +109,7 @@ namespace DatingApp.UnitTests.Services
         public async Task SendMessage_SendToExistingUser_SaveMessageToDB()
         {
             SetUpExistingUsers();
-            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).Returns(Task.FromResult(new Group()));
+            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).ReturnsAsync(new Group());
             _unitOfWork.Setup(u => u.MessageRepository.AddMessage(It.IsAny<Message>())).Verifiable();
 
             var result = await _messageService.SendMessage(_createMessageDto);
@@ -121,13 +121,13 @@ namespace DatingApp.UnitTests.Services
         public async Task SendMessage_WhileRecepientIsInChat_SetDateReadOfMessageAsync()
         {
             SetUpExistingUsers();
-            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).Returns(Task.FromResult(new Group
+            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).ReturnsAsync(new Group
             {
                 Connections = new List<Connection> { 
                     new Connection { Username = "alice" },
                     new Connection { Username = "bob" } 
                 }
-            }));
+            });
             _unitOfWork.Setup(u => u.MessageRepository.AddMessage(It.IsAny<Message>()));
 
             var result = await _messageService.SendMessage(_createMessageDto);
@@ -142,8 +142,8 @@ namespace DatingApp.UnitTests.Services
         {
             SetUpExistingUsers();
             var connections = new List<string>();
-            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).Returns(Task.FromResult(new Group()));
-            _presenceTracker.Setup(t => t.GetConnectionsForUser("bob")).Returns(Task.FromResult(connections));
+            _unitOfWork.Setup(u => u.GroupRepository.GetMessageGroup(It.IsAny<string>())).ReturnsAsync(new Group());
+            _presenceTracker.Setup(t => t.GetConnectionsForUser("bob")).ReturnsAsync(connections);
             _unitOfWork.Setup(u => u.MessageRepository.AddMessage(It.IsAny<Message>()));
 
             var result = await _messageService.SendMessage(_createMessageDto);
@@ -156,7 +156,7 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public void RemoveMessage_MessageDoesntExist_ThrowInvalidActionException()
         {
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).Returns(Task.FromResult((Message)null));
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).ReturnsAsync((Message)null);
 
             Assert.That(async () => await _messageService.RemoveMessage(1, "alice"), Throws.Exception.TypeOf<InvalidActionException>());
         }
@@ -164,12 +164,12 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public void RemoveMessage_MessageSenderOrRecepiantNotMatchesUsername_ThrowUnauthorizedException()
         {
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).Returns(Task.FromResult(new Message
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).ReturnsAsync(new Message
             {
                 Id = 1,
                 Sender = new AppUser { UserName = "bob" },
                 Recipient = new AppUser { UserName = "john" }
-            }));
+            });
 
             Assert.That(async () => await _messageService.RemoveMessage(1, "alice"), Throws.Exception.TypeOf<UnauthorizedException>());
         }
@@ -185,8 +185,8 @@ namespace DatingApp.UnitTests.Services
                 SenderDeleted = true,
                 RecipientDeleted = true,
             };
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).Returns(Task.FromResult(message));
-            _unitOfWork.Setup(u => u.Complete()).Returns(Task.FromResult(true));
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).ReturnsAsync(message);
+            _unitOfWork.Setup(u => u.Complete()).ReturnsAsync(true);
 
             await _messageService.RemoveMessage(1, "alice");
 
@@ -204,8 +204,8 @@ namespace DatingApp.UnitTests.Services
                 SenderDeleted = false,
                 RecipientDeleted = false,
             };
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).Returns(Task.FromResult(message));
-            _unitOfWork.Setup(u => u.Complete()).Returns(Task.FromResult(true));
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).ReturnsAsync(message);
+            _unitOfWork.Setup(u => u.Complete()).ReturnsAsync(true);
 
             var result = await _messageService.RemoveMessage(1, "alice");
 
@@ -223,8 +223,8 @@ namespace DatingApp.UnitTests.Services
                 SenderDeleted = false,
                 RecipientDeleted = false,
             };
-            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).Returns(Task.FromResult(message));
-            _unitOfWork.Setup(u => u.Complete()).Returns(Task.FromResult(true));
+            _unitOfWork.Setup(u => u.MessageRepository.GetMessageAsync(1)).ReturnsAsync(message);
+            _unitOfWork.Setup(u => u.Complete()).ReturnsAsync(true);
 
             var result = await _messageService.RemoveMessage(1, "bob");
 
@@ -233,16 +233,16 @@ namespace DatingApp.UnitTests.Services
 
         private void SetUpExistingUsers()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync("alice")).Returns(Task.FromResult(new AppUser
+            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync("alice")).ReturnsAsync(new AppUser
             {
                 Id = 1,
                 UserName = "alice"
-            }));
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync("bob")).Returns(Task.FromResult(new AppUser
+            });
+            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync("bob")).ReturnsAsync(new AppUser
             {
                 Id = 2,
                 UserName = "bob"
-            }));
+            });
         }
     }
 }
