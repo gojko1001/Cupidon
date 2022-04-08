@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { ToastrModule } from 'ngx-toastr';
 import { from, throwError } from 'rxjs';
 import { AccountService } from 'src/app/services/account.service';
@@ -26,7 +27,8 @@ describe('RegisterComponent', () => {
         HttpClientModule, 
         ToastrModule.forRoot(),
         FormsModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        BsDatepickerModule.forRoot(),
       ],
       providers: [
         {provide: Router, useClass: RouterStub},

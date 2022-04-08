@@ -1,9 +1,11 @@
 import { HttpClientModule } from '@angular/common/http';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ToastrModule } from 'ngx-toastr';
 import { from } from 'rxjs';
-import { AppRoutingModule } from 'src/app/app-routing.module';
 import { Member } from 'src/app/model/user';
 import { MembersService } from 'src/app/services/members.service';
 
@@ -37,9 +39,11 @@ describe('MemberEditComponent', () => {
       imports: [
         HttpClientModule,
         ToastrModule.forRoot(),
-        AppRoutingModule,
+        RouterTestingModule,
+        TabsModule,
         FormsModule
-      ]
+      ],
+      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
     .compileComponents();
   });

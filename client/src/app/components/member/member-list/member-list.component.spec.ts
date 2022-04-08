@@ -1,6 +1,8 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ToastrModule } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { AppRoutingModule } from 'src/app/app-routing.module';
@@ -29,7 +31,10 @@ describe('MemberListComponent', () => {
       imports: [
         HttpClientModule,
         ToastrModule.forRoot(),
-        AppRoutingModule
+        AppRoutingModule,
+        PaginationModule.forRoot(),
+        FormsModule,
+        ReactiveFormsModule
       ]
     })
     .compileComponents();
@@ -41,11 +46,13 @@ describe('MemberListComponent', () => {
     component.userParams = defaultUserParams;
     memberService = fixture.debugElement.injector.get(MembersService)
     fixture.detectChanges();
+
+    spyOn(memberService, 'setUserParams').and.returnValue()
   });
 
   it('should load members', () => {
     spyOn(memberService, 'getMembers').and.returnValue(of({result: [{id: 1}]}))
-
+    
     component.ngOnInit();
 
     expect(component.members).toBeDefined();
@@ -70,6 +77,7 @@ describe('MemberListComponent', () => {
       orederBy: 'lastActive',
     };
     let resetFiltersBtn = fixture.debugElement.query(By.css('#resetFiltersBtn'))
+    spyOn(memberService, 'getMembers').and.returnValue(of({result: [{id: 1}]}))
     spyOn(memberService, 'resetUserParams').and.returnValue(defaultUserParams)
 
     resetFiltersBtn.triggerEventHandler('click', null);
@@ -86,6 +94,7 @@ describe('MemberListComponent', () => {
     };
     fixture.detectChanges();
     let pagination = fixture.debugElement.query(By.css('pagination'));
+    spyOn(memberService, 'getMembers').and.returnValue(of({result: [{id: 1}]}))
 
     pagination.triggerEventHandler('pageChanged', { page: 2});
 

@@ -1,9 +1,9 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ToastrModule } from 'ngx-toastr';
 import { from, of } from 'rxjs';
-import { AppRoutingModule } from 'src/app/app-routing.module';
 import { Member } from 'src/app/model/user';
 import { LikesService } from 'src/app/services/likes.service';
 import { PresenceService } from 'src/app/services/presence.service';
@@ -39,7 +39,7 @@ describe('MemberCardComponent', () => {
       imports: [
         HttpClientModule,
         ToastrModule.forRoot(),
-        AppRoutingModule
+        RouterTestingModule
       ]
     })
     .compileComponents();

@@ -3,8 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { ToastrModule } from 'ngx-toastr';
 import { from, of } from 'rxjs';
+import { HasRoleDirective } from 'src/app/directives/has-role.directive';
 import { AccountService } from 'src/app/services/account.service';
 
 import { NavbarComponent } from './navbar.component';
@@ -21,15 +23,16 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NavbarComponent ],
+      declarations: [ NavbarComponent, HasRoleDirective ],
       imports: [ 
         HttpClientModule, 
         ToastrModule.forRoot(),
         FormsModule,
+        RouterTestingModule
       ],
-      providers: [
-        {provide: Router, useClass: RouterStub},
-      ]
+      // providers: [
+      //   {provide: Router, useClass: RouterStub},
+      // ]
     })
     .compileComponents();
   });
