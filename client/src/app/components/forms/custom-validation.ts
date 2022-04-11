@@ -8,32 +8,24 @@ export function matchValues(matchTo: string): ValidatorFn {
 
 export function numberPattern(): ValidatorFn {
     return (control: AbstractControl) => {
-      if(/\d/.test(control?.value) || control?.value === "")
-        return null;
-      return {requireDigit: true};
+      return (/\d/.test(control?.value) || control?.value === "") ? null : {requireDigit: true};
     }
   }
 
 export function lowercasePattern(): ValidatorFn {
     return (control: AbstractControl) => {
-      if(/[a-z]/.test(control?.value) || control?.value == "")
-        return null;
-      return {requireLowercase: true};
+      return (/[a-z]/.test(control?.value) || control?.value == "") ? null : {requireLowercase: true};
     }
   }
 
 export function uppercasePattern(): ValidatorFn {
     return (control: AbstractControl) => {
-      if(/[A-Z]/.test(control?.value) || control?.value == "")
-        return null;
-      return {requireUppercase: true};
+      return (/[A-Z]/.test(control?.value) || control?.value == "") ? null : {requireUppercase: true};
     }
   }
 
 export function specialCharPattern(): ValidatorFn {
     return (control: AbstractControl) => {
-      if(/[^a-zA-Z\d\s:]/.test(control?.value) || control?.value == "")
-        return null;
-      return {requireSpecial: true};
+      return (/[^a-zA-Z\d\s:]/.test(control?.value) || control?.value == "") ? null : {requireSpecial: true};
     }
   }

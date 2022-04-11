@@ -1,35 +1,90 @@
-import { TestBed } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { By } from '@angular/platform-browser';
+import { RouterOutlet } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { ToastrModule } from 'ngx-toastr';
 import { AppComponent } from './app.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { User } from './model/user';
+import { AccountService } from './services/account.service';
+import { PresenceService } from './services/presence.service';
 
 describe('AppComponent', () => {
+  let fixture: ComponentFixture<AppComponent>;
+  let component: AppComponent;
+  let accService: AccountService;
+  let presenceService: PresenceService;
+
+  let testUser: User = {
+    username: 'alice',
+    profilePhotoUrl: '',
+    knownAs: 'alice',
+    gender: 'female',
+    roles: [],
+    token: 'testtkn',
+    refreshToken: 'testrftkn'
+  }
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        HttpClientModule,
+        ToastrModule.forRoot(),
+        NgxSpinnerModule,
+        FormsModule
       ],
-      declarations: [
-        AppComponent
-      ],
+      declarations: [ AppComponent, NavbarComponent ],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    accService = fixture.debugElement.injector.get(AccountService);
+    presenceService = fixture.debugElement.injector.get(PresenceService)
 
-  it(`should have as title 'client'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('client');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('client app is running!');
-  });
+  })
+
+  it('should have router outlet', () => {
+    let routeroutlet = fixture.debugElement.query(By.directive(RouterOutlet))
+
+    expect(routeroutlet).not.toBeNull();
+  })
+  
+  it('should have navbar', () => {
+    let navabar = fixture.debugElement.query(By.directive(NavbarComponent))
+
+    expect(navabar).not.toBeNull();
+  })
+  
+
+  // TODO: Mock loclastorage?
+  it('should call service to set current user and start presence hub connection, if user is logged in', () => {
+    spyOn(localStorage, 'getItem').withArgs('user').and.returnValue(JSON.stringify(testUser))
+                                  .withArgs('ACTKN').and.returnValue(testUser?.token)
+                                  .withArgs('RFTKN').and.returnValue(testUser?.refreshToken)
+    let spy = spyOn(accService, 'setCurrentUser');
+    let hubSpy = spyOn(presenceService, 'createHubConnection');
+
+    component.ngOnInit();
+
+    expect(spy).toHaveBeenCalledWith(testUser);
+    expect(hubSpy).toHaveBeenCalled();
+  })
+  
+  it('should NOT call service to set current user and  NOT start presence hub connection, if user is NOT logged in', () => {
+    spyOn(localStorage, 'getItem').and.returnValue(null)
+    let spy = spyOn(accService, 'setCurrentUser');
+    let hubSpy = spyOn(presenceService, 'createHubConnection');
+
+    component.ngOnInit();
+
+    expect(spy).not.toHaveBeenCalled();
+    expect(hubSpy).not.toHaveBeenCalled();
+  })
 });
