@@ -64,7 +64,7 @@ namespace DatingApp.Services
                 return;
             throw new InvalidActionException("Failed to update user info");
         }
-        
+
         public async Task<IEnumerable<string>> EditRoles(string username, string[] roles)
         {
             var user = await _userManager.FindByNameAsync(username);
@@ -86,12 +86,9 @@ namespace DatingApp.Services
 
         public async Task ChangePassword(PasswordChangeDto passwordChangeDto, int userId)
         {
-            var user = await _userManager.Users.SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
             if (user == null)
                 throw new UnauthorizedException();
-            var result = await _signInManager.CheckPasswordSignInAsync(user, passwordChangeDto.OldPassword, false);
-            if (!result.Succeeded)
-                throw new UnauthorizedException("Old password is incorrect!");
 
             if (passwordChangeDto.Password != passwordChangeDto.RepeatPassword)
                 throw new InvalidActionException("New password and repeat password must be the same");
@@ -105,7 +102,7 @@ namespace DatingApp.Services
 
         public async Task<AppUser> Register(RegisterDto registerDto)
         {
-            if (await UserExists(registerDto.Username))
+            if (await _unitOfWork.UserRepository.UserExists(registerDto.Username))
             {
                 throw new InvalidActionException("Username already exists!");
             }
@@ -120,16 +117,13 @@ namespace DatingApp.Services
             var roleResult = await _userManager.AddToRoleAsync(user, "Member");
             if (!roleResult.Succeeded)
                 throw new InvalidActionException(string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
-
+        
             return user;
         }
 
         public async Task<AppUser> Login(LoginDto loginDto)
         {
-            var user = await _userManager.Users
-                .Include(p => p.Photos)
-                .Include(u => u.RefreshTokens)
-                .SingleOrDefaultAsync(u => u.UserName == loginDto.Username.ToLower());
+            var user = await _unitOfWork.UserRepository.GetUserByUsernameIncludeRefreshTokens(loginDto.Username);
 
             if (user == null)
                 throw new UnauthorizedException("Invalid username or password!");
@@ -140,8 +134,5 @@ namespace DatingApp.Services
 
             return user;
         }
-
-
-        private async Task<bool> UserExists(string username) => await _userManager.Users.AnyAsync(x => x.UserName == username.ToLower());
     }
 }

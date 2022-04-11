@@ -80,10 +80,19 @@ namespace DatingApp.Repository
             .Include(p => p.Photos)
             .SingleOrDefaultAsync(u => u.UserName == username);
 
+        public Task<AppUser> GetUserByUsernameIncludeRefreshTokens(string username)
+        {
+            return _context.Users
+                .Include(p => p.Photos)
+                .Include(u => u.RefreshTokens)
+                .SingleOrDefaultAsync(u => u.UserName == username.ToLower());
+        }
 
         public void Update(AppUser user)
         {
             _context.Entry(user).State = EntityState.Modified;
         }
+
+        public async Task<bool> UserExists(string username) => await _context.Users.AnyAsync(x => x.UserName == username.ToLower());
     }
 }
