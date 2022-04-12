@@ -10,32 +10,32 @@ namespace DatingApp.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class LikesController : ControllerBase
+    public class UserRelationController : ControllerBase
     {
-        private readonly ILikeService _likeService;
+        private readonly IUserRelationService _relationService;
 
-        public LikesController(ILikeService likeService)
+        public UserRelationController(IUserRelationService relationService)
         {
-            _likeService = likeService;
+            _relationService = relationService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery]LikesParams likesParams)
+        public async Task<ActionResult<IEnumerable<RelationDto>>> GetUserLikes([FromQuery]RelationParams relationParams)
         {
-            likesParams.UserId = User.GetId();
-            PagedList<LikeDto> users = await _likeService.GetUserLikes(likesParams);
+            relationParams.UserId = User.GetId();
+            PagedList<RelationDto> users = await _relationService.GetUserRelations(relationParams);
             Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
             return Ok(users);
         }
 
 
         [HttpPost("{username}")]
-        public async Task<ActionResult> AddLikeAsync(string username)
+        public async Task<ActionResult> AddLike(string username)
         {
             var sourceUsername = User.GetUsername();
             if (sourceUsername == username)
                 return BadRequest("You cannot like yourself");
-            await _likeService.AddLike(sourceUsername, username);
+            await _relationService.AddLike(sourceUsername, username);
             return Ok();
         }
     }

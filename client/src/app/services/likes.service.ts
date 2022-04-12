@@ -8,7 +8,7 @@ import { getPaginatedResult, getPaginationHeaders } from './paginationUtil';
   providedIn: 'root'
 })
 export class LikesService {
-  likesUrl = environment.apiUrl + "likes";
+  likesUrl = environment.apiUrl + "UserRelation";
 
   constructor(private http: HttpClient) { }
   

@@ -3,9 +3,9 @@ using DatingApp.Utils.Pagination;
 
 namespace DatingApp.Services.interfaces
 {
-    public interface ILikeService
+    public interface IUserRelationService
     {
-        Task<PagedList<LikeDto>> GetUserLikes(LikesParams likesParams);
+        Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams);
         Task AddLike(string sourceUsername, string likedUsername);
     }
 }
