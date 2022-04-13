@@ -19,7 +19,7 @@ namespace DatingApp.Services
         public async Task AddLike(string sourceUsername, string likedUsername)
         {
             var sourceUser = await _unitOfWork.UserRelationRepository.GetUserWithRelations(sourceUsername);
-            var likedUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(likedUsername);
+            var likedUser = await _unitOfWork.UserRepository.GetUserByUsername(likedUsername);
 
             if (likedUser == null)
                 throw new NotFoundException();

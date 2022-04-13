@@ -45,7 +45,7 @@ namespace DatingApp.SignalR
 
         private async void updateUserLastActive()
         {
-            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(Context.User.GetUsername());
+            var user = await _unitOfWork.UserRepository.GetUserByUsername(Context.User.GetUsername());
             if (user != null)
             {
                 user.LastActive = DateTime.UtcNow;

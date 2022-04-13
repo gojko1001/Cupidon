@@ -6,7 +6,8 @@ namespace DatingApp.Repository.Interfaces
 {
     public interface IUserRelationRepository
     {
-        Task<UserRelation> GetUserRelation(int sourceUserId, int likedUserId);
+        Task<UserRelation> GetUserRelation(int sourceUserId, int relatedUserId);
+        Task<UserRelation> GetUserRelation(string sourceUsername, string relatedUsername);
         Task<AppUser> GetUserWithRelations(string username);
         Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams);
     }

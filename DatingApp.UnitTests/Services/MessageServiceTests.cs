@@ -233,12 +233,12 @@ namespace DatingApp.UnitTests.Services
 
         private void SetUpExistingUsers()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync("alice")).ReturnsAsync(new AppUser
+            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsername("alice")).ReturnsAsync(new AppUser
             {
                 Id = 1,
                 UserName = "alice"
             });
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync("bob")).ReturnsAsync(new AppUser
+            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsername("bob")).ReturnsAsync(new AppUser
             {
                 Id = 2,
                 UserName = "bob"

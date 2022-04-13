@@ -7,13 +7,13 @@ namespace DatingApp.Repository.Interfaces
     public interface IUserRepository
     {
         void Update(AppUser user);
-        Task<IEnumerable<AppUser>> GetAllAsync();
-        Task<AppUser> GetUserByIdAsync(int id, bool isCurrentUser = false);
-        Task<AppUser> GetUserByUsernameAsync(string username);
+        Task<IEnumerable<AppUser>> GetAll();
+        Task<AppUser> GetUserById(int id, bool isCurrentUser = false);
+        Task<AppUser> GetUserByUsername(string username);
         Task<AppUser> GetUserByUsernameIncludeRefreshTokens(string username);
-        Task<AppUser> GetUserByPhotoIdAsync(int photoId);
-        Task<PagedList<MemberDto>> GetMembersAsync(UserParams userParams);
-        Task<MemberDto> GetMemberAsync(string username, bool isCurrentUser);
+        Task<AppUser> GetUserByPhotoId(int photoId);
+        IQueryable<AppUser> GetMembers(UserParams userParams);
+        Task<MemberDto> GetMember(string username, bool isCurrentUser);
         public Task<bool> UserExists(string username);
     }
 }

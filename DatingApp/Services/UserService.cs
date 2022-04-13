@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Errors;
@@ -26,18 +27,32 @@ namespace DatingApp.Services
         }
 
 
-        public Task<MemberDto> GetUser(string username, bool isCurrentUser)
+        public async Task<MemberDto> GetUser(string username, string requestingUser)
         {
-            return _unitOfWork.UserRepository.GetMemberAsync(username, isCurrentUser);
+            var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(requestingUser, username);
+            if(userRelation != null && userRelation.Relation == RelationStatus.BLOCKED)
+                throw new NotFoundException();
+            return await _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
         }
 
         public async Task<PagedList<MemberDto>> GetUsers(UserParams userParams)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(userParams.CurrentUsername);
+            var user = await _unitOfWork.UserRepository.GetUserByUsername(userParams.CurrentUsername);
             if (string.IsNullOrEmpty(userParams.Gender))
-                userParams.Gender = user.Gender == "male" ? "female" : "male";
+                userParams.Gender = (user.Gender == "male") ? "female" : "male";
 
-            return await _unitOfWork.UserRepository.GetMembersAsync(userParams);
+            var users = _unitOfWork.UserRepository.GetMembers(userParams);
+
+            // TODO: UserRelationSrvice method to get blocked relations from both sides
+            var blocked = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = user.Id, Predicate = "blocked" });
+            var blockedBy = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = user.Id, Predicate = "blockedBy" });
+            var blockedIDs = blocked.Select(u => u.Id).Union(blockedBy.Select(u => u.Id));
+             
+            users = users.Where(u => !blockedIDs.Contains(u.Id));
+
+            return await PagedList<MemberDto>.CreateAsync(users.ProjectTo<MemberDto>(
+                _mapper.ConfigurationProvider).AsNoTracking(),
+                userParams.PageNumber, userParams.PageSize);
         }
 
         public async Task<IEnumerable<object>> GetUsersWithRole()
@@ -56,7 +71,7 @@ namespace DatingApp.Services
 
         public async Task UpdateUser(MemberUpdateDto memberUpdateDto, string username)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+            var user = await _unitOfWork.UserRepository.GetUserByUsername(username);
 
             _mapper.Map(memberUpdateDto, user);
             _unitOfWork.UserRepository.Update(user);
@@ -86,7 +101,7 @@ namespace DatingApp.Services
 
         public async Task ChangePassword(PasswordChangeDto passwordChangeDto, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId);
             if (user == null)
                 throw new UnauthorizedException();
 

@@ -16,9 +16,15 @@ namespace DatingApp.Repository
             _context = context;
         }
 
-        public async Task<UserRelation> GetUserRelation(int sourceUserId, int likedUserId)
+        public async Task<UserRelation> GetUserRelation(int sourceUserId, int relatedUserId)
         {
-            return await _context.UserRelations.FindAsync(sourceUserId, likedUserId);
+            return await _context.UserRelations.FindAsync(sourceUserId, relatedUserId);
+        }
+
+        public async Task<UserRelation> GetUserRelation(string sourceUsername, string relatedUsername)
+        {
+            return await _context.UserRelations
+                .FirstOrDefaultAsync(r => r.SourceUser.UserName == sourceUsername && r.RelatedUser.UserName == relatedUsername);
         }
 
         public async Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams)
@@ -28,23 +34,29 @@ namespace DatingApp.Repository
 
             if (relationParams.Predicate == "liked")
             {
-                relations = relations.Where(like => like.SourceUserId == relationParams.UserId && like.Relation == RelationStatus.LIKED);
-                users = relations.Select(like => like.RelatedUser);
+                relations = relations.Where(r => r.SourceUserId == relationParams.UserId && r.Relation == RelationStatus.LIKED);
+                users = relations.Select(r => r.RelatedUser);
             }
 
             if(relationParams.Predicate == "likedBy")
             {
-                relations = relations.Where(like => like.RelatedUserId == relationParams.UserId && like.Relation == RelationStatus.LIKED);
-                users = relations.Select(like => like.SourceUser);
+                relations = relations.Where(r => r.RelatedUserId == relationParams.UserId && r.Relation == RelationStatus.LIKED);
+                users = relations.Select(r => r.SourceUser);
             }
 
             if (relationParams.Predicate == "blocked")
             {
-                relations = relations.Where(like => like.SourceUserId == relationParams.UserId && like.Relation == RelationStatus.BLOCKED);
-                users = relations.Select(like => like.SourceUser);
+                relations = relations.Where(r => r.SourceUserId == relationParams.UserId && r.Relation == RelationStatus.BLOCKED);
+                users = relations.Select(r => r.RelatedUser);
+            }
+
+            if (relationParams.Predicate == "blockedBy")
+            {
+                relations = relations.Where(r => r.RelatedUserId == relationParams.UserId && r.Relation == RelationStatus.BLOCKED);
+                users = relations.Select(r => r.SourceUser);
             }
             // TODO: Cover Case when predicate is none of the above
-            var likedUsers = users.Select(user => new RelationDto
+            var relatedUsers = users.Select(user => new RelationDto
             {
                 Id = user.Id,
                 Username = user.UserName,
@@ -54,7 +66,7 @@ namespace DatingApp.Repository
                 City = user.City
             });
 
-            return await PagedList<RelationDto>.CreateAsync(likedUsers, relationParams.PageNumber, relationParams.PageSize);
+            return await PagedList<RelationDto>.CreateAsync(relatedUsers, relationParams.PageNumber, relationParams.PageSize);
         }
 
         public async Task<AppUser> GetUserWithRelations(string username)

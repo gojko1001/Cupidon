@@ -20,7 +20,7 @@ namespace DatingApp.Services
 
         public async Task<Photo> AddPhoto(IFormFile file, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
 
             var result = await _cloudinaryService.AddPhotoAsync(file);
             if (result.Error != null)
@@ -44,7 +44,7 @@ namespace DatingApp.Services
 
         public async Task SetMainPhoto(int photoId, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
             var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
             
             if(photo == null)
@@ -67,7 +67,7 @@ namespace DatingApp.Services
 
         public async Task RemovePhoto(int photoId, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
             var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
 
             if (photo == null)
@@ -100,7 +100,7 @@ namespace DatingApp.Services
 
             photo.IsApproved = true;
             
-            var user = await _unitOfWork.UserRepository.GetUserByPhotoIdAsync(photoId);
+            var user = await _unitOfWork.UserRepository.GetUserByPhotoId(photoId);
             if(user != null && !user.Photos.Any(p => p.IsMain))
             {
                 photo.IsMain = true;

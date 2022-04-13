@@ -6,7 +6,7 @@ namespace DatingApp.Services.interfaces
 {
     public interface IUserService
     {
-        Task<MemberDto> GetUser(string username, bool isCurrentUser);
+        Task<MemberDto> GetUser(string username, string requestingUser);
         Task<IEnumerable<object>> GetUsersWithRole();
         Task<PagedList<MemberDto>> GetUsers(UserParams userParams);
         Task UpdateUser(MemberUpdateDto memberUpdateDto, string username);

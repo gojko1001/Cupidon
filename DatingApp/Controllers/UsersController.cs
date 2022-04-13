@@ -36,7 +36,7 @@ namespace DatingApp.Controllers
         [HttpGet("{username}", Name = "GetUser")]
         public async Task<ActionResult<MemberDto>> GetUser(string username)
         {
-            return await _userService.GetUser(username, User.GetUsername() == username);
+            return await _userService.GetUser(username, User.GetUsername());
         }
 
         [HttpPost("add-photo")]

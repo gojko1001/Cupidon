@@ -31,7 +31,7 @@ namespace DatingApp.UnitTests.Services
                 UserName = "alice",
                 RelationToUsers = new List<UserRelation>()
             });
-            _unitOfWork.Setup(uow => uow.UserRepository.GetUserByUsernameAsync(RELATED_USER)).ReturnsAsync(new AppUser
+            _unitOfWork.Setup(uow => uow.UserRepository.GetUserByUsername(RELATED_USER)).ReturnsAsync(new AppUser
             {
                 Id = 2,
                 UserName = "bob",

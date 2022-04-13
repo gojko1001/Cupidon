@@ -49,8 +49,8 @@ namespace DatingApp.Services
 
         public async Task<Message> SendMessage(CreateMessageDto createMessageDto)
         {
-            var sender = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.SenderUsername);
-            var recipient = await _unitOfWork.UserRepository.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
+            var sender = await _unitOfWork.UserRepository.GetUserByUsername(createMessageDto.SenderUsername);
+            var recipient = await _unitOfWork.UserRepository.GetUserByUsername(createMessageDto.RecipientUsername);
 
             if (recipient == null)
                 throw new NotFoundException("Recepient not found");
