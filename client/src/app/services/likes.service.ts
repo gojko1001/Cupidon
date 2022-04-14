@@ -20,6 +20,6 @@ export class LikesService {
   }
 
   addLike(username: string){
-    return this.http.post(this.likesUrl + "/" + username, {});
+    return this.http.post(this.likesUrl + "like/" + username, {});
   }
 }

@@ -7,5 +7,7 @@ namespace DatingApp.Services.interfaces
     {
         Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams);
         Task AddLike(string sourceUsername, string likedUsername);
+        Task AddBlock(string sourceUsername, string blockedUsername);
+        Task RemoveRelation(string sourceUsername, string relatedUsername);
     }
 }

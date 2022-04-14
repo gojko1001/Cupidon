@@ -29,13 +29,33 @@ namespace DatingApp.Controllers
         }
 
 
-        [HttpPost("{username}")]
+        [HttpPost("like/{username}")]
         public async Task<ActionResult> AddLike(string username)
         {
             var sourceUsername = User.GetUsername();
             if (sourceUsername == username)
                 return BadRequest("You cannot like yourself");
             await _relationService.AddLike(sourceUsername, username);
+            return Ok();
+        }
+
+        [HttpPost("block/{username}")]
+        public async Task<ActionResult> AddBlock(string username)
+        {
+            var sourceUsername = User.GetUsername();
+            if (sourceUsername == username)
+                return BadRequest("You cannot block yourself");
+            await _relationService.AddBlock(sourceUsername, username);
+            return Ok();
+        }
+
+        [HttpDelete("{username}")]
+        public async Task<ActionResult> RemoveRelation(string username)
+        {
+            var sourceUsername = User.GetUsername();
+            if (sourceUsername == username)
+                return BadRequest("You cannot have relation to yourself");
+            await _relationService.RemoveRelation(sourceUsername, username);
             return Ok();
         }
     }
