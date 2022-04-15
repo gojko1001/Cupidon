@@ -1,6 +1,7 @@
 ﻿using DatingApp.Data;
 using DatingApp.DTOs;
 using DatingApp.Entities;
+using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Utils.Pagination;
 using Microsoft.EntityFrameworkCore;
@@ -32,30 +33,28 @@ namespace DatingApp.Repository
             var users = _context.Users.OrderBy(u => u.UserName).AsQueryable();
             var relations = _context.UserRelations.AsQueryable();
 
-            if (relationParams.Predicate == "liked")
+            switch (relationParams.Predicate)
             {
-                relations = relations.Where(r => r.SourceUserId == relationParams.UserId && r.Relation == RelationStatus.LIKED);
-                users = relations.Select(r => r.RelatedUser);
+                case "liked":
+                    relations = relations.Where(r => r.SourceUserId == relationParams.UserId && r.Relation == RelationStatus.LIKED);
+                    users = relations.Select(r => r.RelatedUser);
+                    break;
+                case "likedBy":
+                    relations = relations.Where(r => r.RelatedUserId == relationParams.UserId && r.Relation == RelationStatus.LIKED);
+                    users = relations.Select(r => r.SourceUser);
+                    break;
+                case "blocked":
+                    relations = relations.Where(r => r.SourceUserId == relationParams.UserId && r.Relation == RelationStatus.BLOCKED);
+                    users = relations.Select(r => r.RelatedUser);
+                    break;
+                case "blockedBy":
+                    relations = relations.Where(r => r.RelatedUserId == relationParams.UserId && r.Relation == RelationStatus.BLOCKED);
+                    users = relations.Select(r => r.SourceUser);
+                    break;
+                default:
+                    throw new InvalidActionException("Bad predicate");
             }
 
-            if(relationParams.Predicate == "likedBy")
-            {
-                relations = relations.Where(r => r.RelatedUserId == relationParams.UserId && r.Relation == RelationStatus.LIKED);
-                users = relations.Select(r => r.SourceUser);
-            }
-
-            if (relationParams.Predicate == "blocked")
-            {
-                relations = relations.Where(r => r.SourceUserId == relationParams.UserId && r.Relation == RelationStatus.BLOCKED);
-                users = relations.Select(r => r.RelatedUser);
-            }
-
-            if (relationParams.Predicate == "blockedBy")
-            {
-                relations = relations.Where(r => r.RelatedUserId == relationParams.UserId && r.Relation == RelationStatus.BLOCKED);
-                users = relations.Select(r => r.SourceUser);
-            }
-            // TODO: Cover Case when predicate is none of the above
             var relatedUsers = users.Select(user => new RelationDto
             {
                 Id = user.Id,

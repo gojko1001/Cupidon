@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using DatingApp.DTOs;
+﻿using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
@@ -26,11 +25,21 @@ namespace DatingApp.Services
 
         public async Task<PagedList<MessageDto>> GetMessagesForUser(MessageParams messageParams)
         {
-            return await _unitOfWork.MessageRepository.GetMessagesForUserAsync(messageParams);
+            var messages = _unitOfWork.MessageRepository.GetMessagesForUser(messageParams);
+
+            var blocked = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = messageParams.UserId, Predicate = "blocked" });
+            var blockedBy = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = messageParams.UserId, Predicate = "blockedBy" });
+            var blockedIDs = blocked.Select(u => u.Id).Union(blockedBy.Select(u => u.Id));
+
+            messages = messages.Where(m => !blockedIDs.Contains(m.SenderId) && !blockedIDs.Contains(m.RecipientId));
+
+            return await PagedList<MessageDto>.CreateAsync(messages, messageParams.PageNumber, messageParams.PageSize);
         }
 
         public async Task<IEnumerable<Message>> GetMessageThread(string caller, string otherUser)
         {
+            await CheckIfBlockExist(caller, otherUser);
+
             var messages = await _unitOfWork.MessageRepository.GetMessageThread(caller, otherUser);
 
             var unreadMessages = messages.Where(m => m.DateRead == null &&
@@ -49,6 +58,8 @@ namespace DatingApp.Services
 
         public async Task<Message> SendMessage(CreateMessageDto createMessageDto)
         {
+            await CheckIfBlockExist(createMessageDto.SenderUsername, createMessageDto.RecipientUsername);
+
             var sender = await _unitOfWork.UserRepository.GetUserByUsername(createMessageDto.SenderUsername);
             var recipient = await _unitOfWork.UserRepository.GetUserByUsername(createMessageDto.RecipientUsername);
 
@@ -91,9 +102,12 @@ namespace DatingApp.Services
 
         public async Task<Message> RemoveMessage(int messageId, string username)
         {
-            var message = await _unitOfWork.MessageRepository.GetMessageAsync(messageId);
+            var message = await _unitOfWork.MessageRepository.GetMessage(messageId);
             if (message == null)
                 throw new InvalidActionException("Message doesn't exists");
+            
+            await CheckIfBlockExist(username, username == message.Sender.UserName ? message.Recipient.UserName : message.Sender.UserName);
+
             if (message.Sender.UserName != username && message.Recipient.UserName != username)
                 throw new UnauthorizedException();
             if (message.Sender.UserName == username)
@@ -113,6 +127,18 @@ namespace DatingApp.Services
         {
             var stringCompare = string.Compare(caller, other) < 0;
             return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
+        }
+
+        // TODO: Optimize
+        private async Task CheckIfBlockExist(string sourceUsername, string relatedUsername)
+        {
+            var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(sourceUsername, relatedUsername);
+            if (invertedRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
+                throw new NotFoundException("User not found");
+
+            var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(sourceUsername, relatedUsername);
+            if (userRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
+                throw new InvalidActionException("You blocked this user");
         }
     }
 }

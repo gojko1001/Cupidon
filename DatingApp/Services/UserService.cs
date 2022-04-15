@@ -32,22 +32,25 @@ namespace DatingApp.Services
             var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUser);
             if(invertedRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
                 throw new NotFoundException("User not found");
-            var user = _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
+
+            var userQuery = _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
             var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(requestingUser, username);
             if(userRelation != null && userRelation.Relation == RelationStatus.BLOCKED)
             {
-                user = user.Select(u => new MemberDto
+                userQuery = userQuery.Select(u => new MemberDto
                 {
                     Id = u.Id,
                     Age = u.Age,
                     Username = u.Username,
                     KnownAs = u.KnownAs,
                     PhotoUrl = u.PhotoUrl,
-                    RelationTo = userRelation.Relation.ToString(),
                 });
             }
+            var user = userQuery.FirstOrDefault();
+            if(userRelation != null)
+                user.RelationTo = userRelation.Relation.ToString();
 
-            return user.FirstOrDefault();
+            return user;
         }
 
         public async Task<PagedList<MemberDto>> GetUsers(UserParams userParams)

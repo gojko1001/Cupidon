@@ -30,7 +30,7 @@ namespace DatingApp.Repository
             _context.Messages.Remove(message);
         }
 
-        public async Task<Message> GetMessageAsync(int id)
+        public async Task<Message> GetMessage(int id)
         {
             return await _context.Messages
                 .Include(m => m.Sender)
@@ -38,7 +38,7 @@ namespace DatingApp.Repository
                 .SingleOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessageParams messageParams)
+        public IQueryable<MessageDto> GetMessagesForUser(MessageParams messageParams)
         {
             var query = _context.Messages.OrderByDescending(m => m.DateSent)
                 .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
@@ -50,7 +50,7 @@ namespace DatingApp.Repository
                 _ => query.Where(u => u.RecipientUsername == messageParams.UserName && u.DateRead == null && !u.RecipientDeleted)
             };
 
-            return await PagedList<MessageDto>.CreateAsync(query, messageParams.PageNumber, messageParams.PageSize);
+            return query;
         }
 
         public async Task<IEnumerable<Message>> GetMessageThread(string currentUsername, string recipientUsername)

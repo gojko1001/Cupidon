@@ -23,7 +23,7 @@ namespace DatingApp.SignalR
             if (isOnline)
             {
                 await Clients.Others.SendAsync("UserIsOnline", Context.User.GetUsername());
-                updateUserLastActive();
+                UpdateUserLastActive();
             }
 
             var currentUsers = await _tracker.GetOnlineUsers();
@@ -36,14 +36,14 @@ namespace DatingApp.SignalR
             if (isOffline)
             {
                 await Clients.Others.SendAsync("UserIsOffline", Context.User.GetUsername());
-                updateUserLastActive();
+                UpdateUserLastActive();
             }
 
             await base.OnDisconnectedAsync(exception);
         }
 
 
-        private async void updateUserLastActive()
+        private async void UpdateUserLastActive()
         {
             var user = await _unitOfWork.UserRepository.GetUserByUsername(Context.User.GetUsername());
             if (user != null)
