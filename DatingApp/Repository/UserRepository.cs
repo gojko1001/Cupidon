@@ -26,7 +26,7 @@ namespace DatingApp.Repository
             .ToListAsync();
 
 
-        public async Task<MemberDto> GetMember(string username, bool isCurrentUser)
+        public IQueryable<MemberDto> GetMember(string username, bool isCurrentUser)
         {
             var query = _context.Users
                 .Where(u => u.UserName == username)
@@ -34,7 +34,7 @@ namespace DatingApp.Repository
                 .AsQueryable();
             if(isCurrentUser)
                 query = query.IgnoreQueryFilters();
-            return await query.FirstOrDefaultAsync();
+            return query;
         }
 
         public IQueryable<AppUser> GetMembers(UserParams userParams)

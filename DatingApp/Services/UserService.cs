@@ -29,10 +29,25 @@ namespace DatingApp.Services
 
         public async Task<MemberDto> GetUser(string username, string requestingUser)
         {
+            var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUser);
+            if(invertedRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
+                throw new NotFoundException("User not found");
+            var user = _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
             var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(requestingUser, username);
             if(userRelation != null && userRelation.Relation == RelationStatus.BLOCKED)
-                throw new NotFoundException();
-            return await _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
+            {
+                user = user.Select(u => new MemberDto
+                {
+                    Id = u.Id,
+                    Age = u.Age,
+                    Username = u.Username,
+                    KnownAs = u.KnownAs,
+                    PhotoUrl = u.PhotoUrl,
+                    RelationTo = userRelation.Relation.ToString(),
+                });
+            }
+
+            return user.FirstOrDefault();
         }
 
         public async Task<PagedList<MemberDto>> GetUsers(UserParams userParams)

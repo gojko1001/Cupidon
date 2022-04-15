@@ -5,14 +5,14 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { of } from 'rxjs';
 import { PaginatedResult, Pagination } from 'src/app/model/pagination';
 import { Member } from 'src/app/model/user';
-import { LikesService } from 'src/app/services/likes.service';
+import { UserRelationService } from 'src/app/services/user-relation.service';
 
 import { ListsComponent } from './lists.component';
 
 describe('ListsComponent', () => {
   let component: ListsComponent;
   let fixture: ComponentFixture<ListsComponent>;
-  let likeService: LikesService;
+  let userRelationService: UserRelationService;
 
   let testMember1: Member = { 
     id: 1,
@@ -88,12 +88,12 @@ describe('ListsComponent', () => {
     component.predicate = 'liked'
     component.pageNumber = 1;
     component.pageSize = 5;
-    likeService = fixture.debugElement.injector.get(LikesService);
+    userRelationService = fixture.debugElement.injector.get(UserRelationService);
     fixture.detectChanges();
   });
 
   it("should call a server to load user's like lists", () => {
-    let spy = spyOn(likeService, 'getLikes').and.returnValue(of(paginatedResult))
+    let spy = spyOn(userRelationService, 'getRelations').and.returnValue(of(paginatedResult))
 
     component.ngOnInit();
 
@@ -101,7 +101,7 @@ describe('ListsComponent', () => {
   });
   
   it("should load user's like lists and set pagination", () => {
-    spyOn(likeService, 'getLikes').and.returnValue(of(paginatedResult))
+    spyOn(userRelationService, 'getRelations').and.returnValue(of(paginatedResult))
 
     component.ngOnInit();
 
@@ -113,7 +113,7 @@ describe('ListsComponent', () => {
     component.pagination = pagination;
     fixture.detectChanges();
     let paginationEl = fixture.debugElement.query(By.css('pagination'));
-    spyOn(likeService, 'getLikes').and.returnValue(of(paginatedResult))
+    spyOn(userRelationService, 'getRelations').and.returnValue(of(paginatedResult))
 
     paginationEl.triggerEventHandler('pageChanged', { page: 2});
 

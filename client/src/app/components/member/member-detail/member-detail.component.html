@@ -1,17 +1,20 @@
- <div class="row">
-     <div class="col-4">
-         <div class="card">
-             <img src="{{member.photoUrl || './assets/user.png'}}" alt="{{member.knownAs}}" class="card-img-top img-thumbnail">
-             <div class="card-body">
-                 <div *ngIf="member.username != user.username">
-                     <div class="mb-2 text-success" *ngIf="(presence.onlineUsers$ | async).includes(member.username)">
-                         <i class="fa fa-user-circle"></i> Active
-                     </div>
-                     <div class="mb-2" *ngIf="!(presence.onlineUsers$ | async).includes(member.username)">
-                         <i class="fa fa-clock-o"></i> {{member.lastActive | timeago}}
-                     </div>
-                 </div>
+<div class="row">
+    <div class="col-4">
+        <div class="card">
+            <img src="{{member.photoUrl || './assets/user.png'}}" alt="{{member.knownAs}}" class="card-img-top img-thumbnail">
+            <div class="card-body">
                 <div>
+                    <strong style="font-size: 25px;">{{member.username | titlecase}}</strong>
+                </div>
+                <div *ngIf="member.username != user.username && member.relationTo != 'BLOCKED'">
+                    <div class="mb-2 text-success" *ngIf="(presence.onlineUsers$ | async).includes(member.username)">
+                        <i class="fa fa-user-circle"></i> Active
+                    </div>
+                    <div class="mb-2" *ngIf="!(presence.onlineUsers$ | async).includes(member.username)">
+                        <i class="fa fa-clock-o"></i> {{member.lastActive | timeago}}
+                    </div>
+                </div>
+                <div *ngIf="member.relationTo != 'BLOCKED'">
                     <strong>Location: </strong>
                     <p>{{member.city}}, {{member.country}}</p>
                 </div>
@@ -19,44 +22,52 @@
                     <strong>Age: </strong>
                     <p>{{member.age}}</p>
                 </div>
-                <div>
+                <div *ngIf="member.relationTo != 'BLOCKED'">
                     <strong>Member since: </strong>
                     <p>{{member.created | date:'dd. MMM, yyyy.'}}</p>
                 </div>
-             </div>
-             <div class="card-footer">
-                 <div class="btn-group d-flex">
-                     <ng-container *ngIf="member.username != user.username">
-                         <button class="btn btn-primary" (click)="addLike(member)">Like</button>
-                         <button class="btn btn-secondary" (click)="selectTab(3)">Message</button>
-                     </ng-container>
-                     <button class="btn btn-primary" *ngIf="member.username == user.username" routerLink="/member/edit">Edit</button>
-                 </div>
-             </div>
-         </div>
-     </div>
-     <div class="col-8">
-         <tabset class="member-tabset" #memberTabs>
-             <tab heading="About {{member.knownAs}}" (selectTab)="onTabActivated($event)">
-                 <h4>Description</h4>
-                 <p>{{member.introduction}}</p>
-                 <h4>Looking for</h4>
-                 <p>{{member.lookingFor}}</p>
-             </tab>
-             <tab heading="Intrests" (selectTab)="onTabActivated($event)">
-                <h4>Intrests</h4>
-                <p>{{member.interests}}</p>
-            </tab>
-            <tab heading="Photos" (selectTab)="onTabActivated($event)">
-               <ngx-gallery [options]="galleryOptions" [images]="galleryImages" class="ngx-gallery"
-               style="display: inline-block; margin-bottom: 20px;"></ngx-gallery> 
-            </tab>
-            <tab heading="Messages" (selectTab)="onTabActivated($event)">
-                <app-member-messages *ngIf="member.username != user.username"></app-member-messages>
-                <div *ngIf="member.username == user.username" class="btn-group d-flex">
-                    <button class="btn btn-primary" [routerLink]="['/messages']">Go to messages</button>
+            </div>
+            <div class="card-footer">
+                <div class="btn-group d-flex">
+                    <ng-container *ngIf="member.username != user.username && member.relationTo != 'BLOCKED'">
+                        <button class="btn btn-primary" (click)="addLike()">Like</button>
+                        <button class="btn btn-secondary" (click)="selectTab(3)">Message</button>
+                        <button class="btn btn-danger" (click)="blockUser()">Block</button>
+                    </ng-container>
+                    <button class="btn btn-primary" *ngIf="member.username == user.username" routerLink="/member/edit">Edit</button>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-8" >
+        <tabset class="member-tabset" #memberTabs [hidden]="member.relationTo === 'BLOCKED'">
+            <tab heading="About {{member.knownAs}}" (selectTab)="onTabActivated($event)">
+                <h4>Description</h4>
+                <p>{{member.introduction}}</p>
+                <h4>Looking for</h4>
+                <p>{{member.lookingFor}}</p>
             </tab>
-         </tabset>
-     </div>
- </div>
+            <tab heading="Intrests" (selectTab)="onTabActivated($event)">
+            <h4>Intrests</h4>
+            <p>{{member.interests}}</p>
+        </tab>
+        <tab heading="Photos" (selectTab)="onTabActivated($event)">
+            <ngx-gallery [options]="galleryOptions" [images]="galleryImages" class="ngx-gallery"
+            style="display: inline-block; margin-bottom: 20px;"></ngx-gallery> 
+        </tab>
+        <tab heading="Messages" (selectTab)="onTabActivated($event)">
+            <app-member-messages *ngIf="member.username != user.username"></app-member-messages>
+            <div *ngIf="member.username == user.username" class="btn-group d-flex">
+                <button class="btn btn-primary" [routerLink]="['/messages']">Go to messages</button>
+            </div>
+        </tab>
+        </tabset>
+
+        <div *ngIf="member.relationTo === 'BLOCKED'" class="align-self-center">
+            <h2 class="text-center">Unblock To view member photos and details:</h2>
+            <div class="d-flex btn-group">
+                <button class="btn btn-outline-danger" (click)="unblock()">Unblock</button>
+            </div>
+        </div>
+    </div>
+</div>

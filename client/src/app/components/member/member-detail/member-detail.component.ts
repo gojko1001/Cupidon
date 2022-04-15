@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
 import { Member, User } from 'src/app/model/user';
 import { AccountService } from 'src/app/services/account.service';
-import { LikesService } from 'src/app/services/likes.service';
+import { UserRelationService } from 'src/app/services/user-relation.service';
 import { MessageService } from 'src/app/services/message.service';
 import { PresenceService } from 'src/app/services/presence.service';
 
@@ -27,15 +27,14 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   constructor(private accountService: AccountService,
               private messageService: MessageService,
-              private likesService: LikesService,
+              private userRelationService: UserRelationService,
               private toastr: ToastrService,
               private route: ActivatedRoute,
               private router: Router,
               public presence: PresenceService) {
                 this.accountService.currentUser$.pipe(take(1)).subscribe(data => this.user = data);
                 this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-               }
-               
+               }        
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
@@ -62,6 +61,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   getImages(): NgxGalleryImage[] {
     const imageUrls = [];
+    if(!this.member.photos) return;
     for(let photo of this.member.photos){
       if(photo.isApproved){
         imageUrls.push({
@@ -75,10 +75,22 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   }
 
 
-  addLike(member: Member){
-    this.likesService.addLike(member.username).subscribe(() => {
-      this.toastr.success('You have liked ' + member.knownAs);
+  addLike(){
+    this.userRelationService.addLike(this.member.username).subscribe(() => {
+      this.toastr.success('You have liked ' + this.member.knownAs);
     });
+  }
+
+  blockUser(){
+    this.userRelationService.addBlock(this.member.username).subscribe(() => {
+      window.location.href = window.location.href.split("?")[0];
+    })
+  }
+
+  unblock(){
+    this.userRelationService.removeRelation(this.member.username).subscribe(() => {
+      window.location.href = window.location.href.split("?")[0];
+    })
   }
   
   onTabActivated(data: TabDirective){

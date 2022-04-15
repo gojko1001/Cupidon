@@ -13,7 +13,7 @@ namespace DatingApp.Repository.Interfaces
         Task<AppUser> GetUserByUsernameIncludeRefreshTokens(string username);
         Task<AppUser> GetUserByPhotoId(int photoId);
         IQueryable<AppUser> GetMembers(UserParams userParams);
-        Task<MemberDto> GetMember(string username, bool isCurrentUser);
+        IQueryable<MemberDto> GetMember(string username, bool isCurrentUser);
         public Task<bool> UserExists(string username);
     }
 }

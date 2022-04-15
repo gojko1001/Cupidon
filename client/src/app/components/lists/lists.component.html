@@ -1,12 +1,16 @@
 <div class="text-center mt-3">
-    <h2>{{predicate === 'liked' ? 'Members I like' : 'Members who like me'}}</h2>
+    <h2 *ngIf="predicate === 'liked'">Members I like</h2>
+    <h2 *ngIf="predicate === 'likedBy'">Members who like me</h2>
+    <h2 *ngIf="predicate === 'blocked'">Members I blocked</h2>
     <div class="container mt-3">
         <div class="row">
             <div class="btn-group" name="predicate">
                 <button class="btn btn-primary" btnRadio="liked" 
-                    [(ngModel)]="predicate" (click)="loadLikes()">Members I like</button>
+                    [(ngModel)]="predicate" (click)="loadRelations()">Members I like</button>
                 <button class="btn btn-primary" btnRadio="likedBy" 
-                    [(ngModel)]="predicate" (click)="loadLikes()">Member who likes me</button>
+                    [(ngModel)]="predicate" (click)="loadRelations()">Member who likes me</button>
+                <button class="btn btn-primary" btnRadio="blocked" 
+                    [(ngModel)]="predicate" (click)="loadRelations()">Blocked members</button>
             </div>
         </div>
 
