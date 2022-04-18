@@ -23,6 +23,7 @@ namespace DatingApp.Controllers
         public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessagesForUser([FromQuery]MessageParams messageParams)
         {
             messageParams.UserName = User.GetUsername();
+            messageParams.UserId = User.GetId();
             var messages = await _messageService.GetMessagesForUser(messageParams);
             Response.AddPaginationHeader(messages.CurrentPage, messages.PageSize, messages.TotalCount, messages.TotalPages);
             return Ok(messages);

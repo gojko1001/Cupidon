@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LikesService } from './likes.service';
+import { UserRelationService } from './user-relation.service';
 
 xdescribe('LikesService', () => {
-  let service: LikesService;
+  let service: UserRelationService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(LikesService);
+    service = TestBed.inject(UserRelationService);
   });
 });

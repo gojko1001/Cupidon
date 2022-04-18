@@ -20,7 +20,7 @@ namespace DatingApp.Services
 
         public async Task<Photo> AddPhoto(IFormFile file, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
 
             var result = await _cloudinaryService.AddPhotoAsync(file);
             if (result.Error != null)
@@ -35,16 +35,14 @@ namespace DatingApp.Services
             user.Photos.Add(photo);
 
             if (await _unitOfWork.Complete())
-            {
                 return photo;
-            }
 
-            throw new InvalidActionException("Error while adding new photo!");
+            throw new ServerErrorException("Error while adding new photo!");
         }
 
         public async Task SetMainPhoto(int photoId, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
             var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
             
             if(photo == null)
@@ -62,12 +60,12 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to set main photo");
+            throw new ServerErrorException("Failed to set main photo");
         }
 
         public async Task RemovePhoto(int photoId, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId, true);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
             var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
 
             if (photo == null)
@@ -84,7 +82,7 @@ namespace DatingApp.Services
             user.Photos.Remove(photo);
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to delete photo");
+            throw new ServerErrorException("Failed to delete photo");
         }
 
         public Task<IEnumerable<PhotoForApprovalDto>> GetUnapprovedPhotos()
@@ -100,7 +98,7 @@ namespace DatingApp.Services
 
             photo.IsApproved = true;
             
-            var user = await _unitOfWork.UserRepository.GetUserByPhotoIdAsync(photoId);
+            var user = await _unitOfWork.UserRepository.GetUserByPhotoId(photoId);
             if(user != null && !user.Photos.Any(p => p.IsMain))
             {
                 photo.IsMain = true;
@@ -108,7 +106,7 @@ namespace DatingApp.Services
 
             if(await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to approve photo");
+            throw new ServerErrorException("Failed to approve photo");
         }
 
         public async Task RejectPhoto(int photoId)
@@ -129,7 +127,7 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to delete photo");
+            throw new ServerErrorException("Failed to delete photo");
         }
     }
 }

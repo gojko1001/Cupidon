@@ -16,7 +16,7 @@ namespace DatingApp.Data
         {
         }
 
-        public DbSet<UserLike> Likes { get; set; }
+        public DbSet<UserRelation> UserRelations { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Group> Groups { get; set; }
@@ -44,19 +44,19 @@ namespace DatingApp.Data
                 .WithMany(u => u.RefreshTokens)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<UserLike>()
-                .HasKey(k => new { k.SourceUserId, k.LikedUserId });
+            builder.Entity<UserRelation>()
+                .HasKey(k => new { k.SourceUserId, k.RelatedUserId });
 
-            builder.Entity<UserLike>()
+            builder.Entity<UserRelation>()
                 .HasOne(s => s.SourceUser)
-                .WithMany(l => l.LikedUsers)
+                .WithMany(l => l.RelationToUsers)
                 .HasForeignKey(s => s.SourceUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Entity<UserLike>()
-                .HasOne(s => s.LikedUser)
-                .WithMany(l => l.LikedByUsers)
-                .HasForeignKey(s => s.LikedUserId)
+            builder.Entity<UserRelation>()
+                .HasOne(s => s.RelatedUser)
+                .WithMany(l => l.RelationByUsers)
+                .HasForeignKey(s => s.RelatedUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
 

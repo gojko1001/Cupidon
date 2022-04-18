@@ -5,7 +5,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ToastrModule } from 'ngx-toastr';
 import { from, of } from 'rxjs';
 import { Member } from 'src/app/model/user';
-import { LikesService } from 'src/app/services/likes.service';
+import { UserRelationService } from 'src/app/services/user-relation.service';
 import { PresenceService } from 'src/app/services/presence.service';
 
 import { MemberCardComponent } from './member-card.component';
@@ -13,7 +13,7 @@ import { MemberCardComponent } from './member-card.component';
 describe('MemberCardComponent', () => {
   let component: MemberCardComponent;
   let fixture: ComponentFixture<MemberCardComponent>;
-  let likeService: LikesService;
+  let userRelationService: UserRelationService;
   let presenceService: PresenceService;
 
   let testMember: Member = { 
@@ -49,7 +49,7 @@ describe('MemberCardComponent', () => {
     fixture = TestBed.createComponent(MemberCardComponent);
     component = fixture.componentInstance;
     component.member = testMember;
-    likeService = fixture.debugElement.injector.get(LikesService);
+    userRelationService = fixture.debugElement.injector.get(UserRelationService);
     presenceService = fixture.debugElement.injector.get(PresenceService);
     fixture.detectChanges();
   });
@@ -75,7 +75,7 @@ describe('MemberCardComponent', () => {
   
   it('should call server to like user if i click on like button', () => {
     let likeBtn = fixture.debugElement.query(By.css("#likeBtn"));
-    let spy = spyOn(likeService, 'addLike').and.returnValue(from([]))
+    let spy = spyOn(userRelationService, 'addLike').and.returnValue(from([]))
     
     likeBtn.triggerEventHandler('click', null);
 

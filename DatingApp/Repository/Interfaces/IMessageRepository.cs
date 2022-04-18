@@ -8,8 +8,8 @@ namespace DatingApp.Repository.Interfaces
     {
         void AddMessage(Message message);
         void RemoveMessage(Message message);
-        Task<Message> GetMessageAsync(int id);
-        Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessageParams messageParams);
+        Task<Message> GetMessage(int id);
+        IQueryable<MessageDto> GetMessagesForUser(MessageParams messageParams);
         Task<IEnumerable<Message>> GetMessageThread(string currentUsername, string recipientUsername);
     }
 }

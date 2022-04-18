@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Pagination } from 'src/app/model/pagination';
 import { Member } from 'src/app/model/user';
-import { LikesService } from 'src/app/services/likes.service';
+import { UserRelationService } from 'src/app/services/user-relation.service';
 
 @Component({
   selector: 'app-lists',
@@ -15,14 +15,14 @@ export class ListsComponent implements OnInit {
   pageSize = 5;
   pagination: Pagination;
 
-  constructor(private likesService: LikesService) { }
+  constructor(private userRelationService: UserRelationService) { }
 
   ngOnInit(): void {
-    this.loadLikes();
+    this.loadRelations();
   }
 
-  loadLikes(){
-    this.likesService.getLikes(this.predicate, this.pageNumber, this.pageSize).subscribe(repsonse => {
+  loadRelations(){
+    this.userRelationService.getRelations(this.predicate, this.pageNumber, this.pageSize).subscribe(repsonse => {
       this.members = repsonse.result;
       this.pagination = repsonse.pagination;
     })
@@ -30,7 +30,7 @@ export class ListsComponent implements OnInit {
 
   pageChanged(event: any){
     this.pageNumber = event.page;
-    this.loadLikes();
+    this.loadRelations();
   }
 
 }

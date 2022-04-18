@@ -2,7 +2,7 @@
 {
     public class PresenceTracker
     {
-        private static readonly Dictionary<string, List<string>> OnlineUsers = new Dictionary<string, List<string>>();
+        private static readonly Dictionary<string, List<string>> OnlineUsers = new();
 
         public Task<bool> UserConnected(string username, string connectionId)
         {

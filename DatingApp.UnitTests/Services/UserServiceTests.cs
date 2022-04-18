@@ -4,11 +4,13 @@ using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services;
+using DatingApp.Services.interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatingApp.UnitTests.Services
@@ -18,27 +20,29 @@ namespace DatingApp.UnitTests.Services
     {
         private Mock<IUnitOfWork> _unitOfWork;
         private Mock<IMapper> _mapper;
+        private Mock<IUserRelationService> _userRelationService;
         private Mock<UserManager<AppUser>> _userManager;
         private Mock<SignInManager<AppUser>> _signInManager;
         private UserService _userService;
 
-        private AppUser _testUser = new AppUser { Id = 1, UserName = "alice"};
+        private AppUser _testUser = new() { Id = 1, UserName = "alice"};
 
         [SetUp]
         public void SetUp()
         {
             _unitOfWork = new Mock<IUnitOfWork>();
             _mapper = new Mock<IMapper>();
+            _userRelationService = new Mock<IUserRelationService>();
             _userManager = MockUserManager<AppUser>();
             _signInManager = MockSignInManager<AppUser>();
 
-            _userService = new UserService(_unitOfWork.Object, _mapper.Object, _userManager.Object, _signInManager.Object);
+            _userService = new UserService(_unitOfWork.Object, _mapper.Object, _userRelationService.Object, _userManager.Object, _signInManager.Object);
         }
-
+            
         [Test]
         public async Task UpdateUser_WhenCalled_SaveChangesToDB()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsernameAsync(_testUser.UserName)).ReturnsAsync(_testUser);
+            _unitOfWork.Setup(u => u.UserRepository.GetUserByUsername(_testUser.UserName)).ReturnsAsync(_testUser);
             _unitOfWork.Setup(u => u.Complete()).ReturnsAsync(true);
 
             await _userService.UpdateUser(new MemberUpdateDto(), _testUser.UserName);
@@ -48,7 +52,7 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void EditRoles_UserDoesntExist_ThrowInvalidActionException()
+        public void EditRoles_UserDoesNotExist_ThrowInvalidActionException()
         {
             _userManager.Setup(mgr => mgr.FindByNameAsync(It.IsAny<string>())).Verifiable();
 
@@ -72,9 +76,9 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void ChangePassword_UserDoesntExist_ThrowUnauthorizedException()
+        public void ChangePassword_UserDoesNotExist_ThrowUnauthorizedException()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByIdAsync(It.IsAny<int>(), It.IsAny<bool>())).Verifiable();
+            _unitOfWork.Setup(u => u.UserRepository.GetUserById(It.IsAny<int>(), It.IsAny<bool>())).Verifiable();
 
             Assert.That(async () => await _userService.ChangePassword(new PasswordChangeDto(), 1), Throws.Exception.TypeOf<UnauthorizedException>());
         }
@@ -82,7 +86,7 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public void ChangePassword_PasswordAndRepeatPasswordNotMatch_ThrowInvalidActionException()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByIdAsync(_testUser.Id, It.IsAny<bool>())).ReturnsAsync(_testUser);
+            _unitOfWork.Setup(u => u.UserRepository.GetUserById(_testUser.Id, It.IsAny<bool>())).ReturnsAsync(_testUser);
 
             Assert.That(async () => await _userService.ChangePassword(
                 new PasswordChangeDto { OldPassword = "a", Password = "b", RepeatPassword = "c" }, 1), Throws.Exception.TypeOf<InvalidActionException>());
@@ -91,7 +95,7 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public void ChangePassword_PasswordAndOldPasswordAreSame_ThrowInvalidActionException()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByIdAsync(_testUser.Id, It.IsAny<bool>())).ReturnsAsync(_testUser);
+            _unitOfWork.Setup(u => u.UserRepository.GetUserById(_testUser.Id, It.IsAny<bool>())).ReturnsAsync(_testUser);
 
             Assert.That(async () => await _userService.ChangePassword(
                 new PasswordChangeDto { OldPassword = "a", Password = "a", RepeatPassword = "a" }, 1), Throws.Exception.TypeOf<InvalidActionException>());
@@ -100,7 +104,7 @@ namespace DatingApp.UnitTests.Services
         [Test]
         public async Task ChangePassword_WithValidParameters_InvokeChangePasswordOfUserManager()
         {
-            _unitOfWork.Setup(u => u.UserRepository.GetUserByIdAsync(_testUser.Id, It.IsAny<bool>())).ReturnsAsync(_testUser);
+            _unitOfWork.Setup(u => u.UserRepository.GetUserById(_testUser.Id, It.IsAny<bool>())).ReturnsAsync(_testUser);
             _userManager.Setup(mgr => mgr.ChangePasswordAsync(It.IsAny<AppUser>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
 
             await _userService.ChangePassword(new PasswordChangeDto { OldPassword = "a", Password = "b", RepeatPassword = "b" }, 1);
@@ -142,7 +146,7 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void Login_UserDoesntExist_ThrowUnauthorizedException()
+        public void Login_UserDoesNotExist_ThrowUnauthorizedException()
         {
             var loginDto = new LoginDto
             {

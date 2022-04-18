@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Errors;
@@ -14,30 +15,64 @@ namespace DatingApp.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IUserRelationService _userRelationService;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IUserRelationService userRelationService,
+            UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userRelationService = userRelationService;
             _userManager = userManager;
             _signInManager = signInManager;
         }
 
 
-        public Task<MemberDto> GetUser(string username, bool isCurrentUser)
+        public async Task<MemberDto> GetUser(string username, string requestingUser)
         {
-            return _unitOfWork.UserRepository.GetMemberAsync(username, isCurrentUser);
+            var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUser);
+            if(invertedRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
+                throw new NotFoundException("User not found");
+
+            var userQuery = _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
+            var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(requestingUser, username);
+            if(userRelation != null && userRelation.Relation == RelationStatus.BLOCKED)
+            {
+                userQuery = userQuery.Select(u => new MemberDto
+                {
+                    Id = u.Id,
+                    Age = u.Age,
+                    Username = u.Username,
+                    KnownAs = u.KnownAs,
+                    PhotoUrl = u.PhotoUrl,
+                });
+            }
+            var user = userQuery.FirstOrDefault();
+            if (user == null) throw new NotFoundException("User not found");
+
+            if(userRelation != null)
+                user.RelationTo = userRelation.Relation.ToString();
+
+            return user;
         }
 
         public async Task<PagedList<MemberDto>> GetUsers(UserParams userParams)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(userParams.CurrentUsername);
+            var user = await _unitOfWork.UserRepository.GetUserByUsername(userParams.CurrentUsername);
             if (string.IsNullOrEmpty(userParams.Gender))
-                userParams.Gender = user.Gender == "male" ? "female" : "male";
+                userParams.Gender = (user.Gender == "male") ? "female" : "male";
 
-            return await _unitOfWork.UserRepository.GetMembersAsync(userParams);
+            var users = _unitOfWork.UserRepository.GetMembers(userParams);
+
+            var blockedIDs = await _userRelationService.GetBlockedRelationsIds(user.Id);
+
+            users = users.Where(u => !blockedIDs.Contains(u.Id));
+
+            return await PagedList<MemberDto>.CreateAsync(users.ProjectTo<MemberDto>(
+                _mapper.ConfigurationProvider).AsNoTracking(),
+                userParams.PageNumber, userParams.PageSize);
         }
 
         public async Task<IEnumerable<object>> GetUsersWithRole()
@@ -56,13 +91,13 @@ namespace DatingApp.Services
 
         public async Task UpdateUser(MemberUpdateDto memberUpdateDto, string username)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+            var user = await _unitOfWork.UserRepository.GetUserByUsername(username);
 
             _mapper.Map(memberUpdateDto, user);
             _unitOfWork.UserRepository.Update(user);
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to update user info");
+            throw new ServerErrorException("Failed to update user info");
         }
 
         public async Task<IEnumerable<string>> EditRoles(string username, string[] roles)
@@ -86,7 +121,7 @@ namespace DatingApp.Services
 
         public async Task ChangePassword(PasswordChangeDto passwordChangeDto, int userId)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByIdAsync(userId);
+            var user = await _unitOfWork.UserRepository.GetUserById(userId);
             if (user == null)
                 throw new UnauthorizedException();
 

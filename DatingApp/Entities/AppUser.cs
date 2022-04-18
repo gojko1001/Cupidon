@@ -16,8 +16,8 @@ namespace DatingApp.Entities
         public string City { get; set; }
         public string Country { get; set; }
         public ICollection<Photo> Photos { get; set; }
-        public ICollection<UserLike> LikedByUsers { get; set; }
-        public ICollection<UserLike> LikedUsers { get; set; }
+        public ICollection<UserRelation> RelationByUsers { get; set; }
+        public ICollection<UserRelation> RelationToUsers { get; set; }
         public ICollection<Message> MessagesSent { get; set; }
         public ICollection<Message> MessagesRecieved { get; set; }
         public ICollection<AppUserRole> Roles { get; set; }

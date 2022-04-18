@@ -22,7 +22,7 @@ namespace DatingApp.Extensions
             });
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
-            services.AddScoped<ILikeService, LikeService>();
+            services.AddScoped<IUserRelationService, UserRelationService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();

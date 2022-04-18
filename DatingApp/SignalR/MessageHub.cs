@@ -35,7 +35,7 @@ namespace DatingApp.SignalR
 
             var messages = await _messageService.GetMessageThread(caller, otherUser);
 
-            await Clients.Caller.SendAsync("ReceiveMessageThread", _mapper.Map<MessageDto>(messages));
+            await Clients.Caller.SendAsync("ReceiveMessageThread", _mapper.Map<IEnumerable<MessageDto>>(messages));
         }
 
         public override async Task OnDisconnectedAsync(Exception exception)

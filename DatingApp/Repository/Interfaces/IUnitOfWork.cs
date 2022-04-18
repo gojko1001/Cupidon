@@ -5,7 +5,7 @@
         IUserRepository UserRepository { get; }
         IPhotoRepository PhotoRepository { get; }
         IMessageRepository MessageRepository { get; }
-        ILikesRepository LikesRepository { get; }
+        IUserRelationRepository UserRelationRepository { get; }
         IGroupRepository GroupRepository { get; }
         IRefreshTokenRepository RefreshTokenRepository { get; }
         Task<bool> Complete();
