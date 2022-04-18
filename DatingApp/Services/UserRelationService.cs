@@ -16,6 +16,25 @@ namespace DatingApp.Services
             _unitOfWork = unitOfWork;
         }
 
+        public async Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams)
+        {
+            return await _unitOfWork.UserRelationRepository.GetUserRelations(relationParams);
+        }
+
+        public async Task<IEnumerable<int>> GetBlockedRelationsIds(int id)
+        {
+            var relations = await _unitOfWork.UserRelationRepository.GetBlockedRelations(id);
+            List<int> ids = new();
+            foreach(UserRelation userRelation in relations)
+            {
+                if(userRelation.SourceUserId != id)
+                    ids.Add(userRelation.SourceUserId);
+                else
+                    ids.Add(userRelation.RelatedUserId);
+            }
+            return ids;
+        }
+
         public async Task AddLike(string sourceUsername, string likedUsername)
         {
             var sourceUser = await _unitOfWork.UserRelationRepository.GetUserWithRelations(sourceUsername);
@@ -115,9 +134,5 @@ namespace DatingApp.Services
             throw new InvalidActionException("Failed to remove relation!");
         }
 
-        public async Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams)
-        {
-            return await _unitOfWork.UserRelationRepository.GetUserRelations(relationParams);
-        }
     }
 }

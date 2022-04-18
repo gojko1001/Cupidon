@@ -182,5 +182,21 @@ namespace DatingApp.UnitTests.Services
 
             _unitOfWork.Verify(uow => uow.UserRelationRepository.GetUserRelations(likeParameters));
         }
+
+
+        [Test]
+        public async Task GetBlockedRelationsIds_WhenCalled_FormListOfIdsAsync()
+        {
+            var userId = 1;
+            _unitOfWork.Setup(u => u.UserRelationRepository.GetBlockedRelations(userId)).ReturnsAsync(new List<UserRelation>
+            {
+                new UserRelation{ SourceUserId = userId, RelatedUserId = 2 },
+                new UserRelation{ SourceUserId = 3, RelatedUserId = userId },
+            });
+
+            var result = await _relationService.GetBlockedRelationsIds(userId);
+
+            Assert.That(result, Is.EquivalentTo(new List<int> { 2, 3 }));
+        }
     }
 }

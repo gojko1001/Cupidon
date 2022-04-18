@@ -15,13 +15,16 @@ namespace DatingApp.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IUserRelationService _userRelationService;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IUserRelationService userRelationService,
+            UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userRelationService = userRelationService;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -47,6 +50,8 @@ namespace DatingApp.Services
                 });
             }
             var user = userQuery.FirstOrDefault();
+            if (user == null) throw new NotFoundException("User not found");
+
             if(userRelation != null)
                 user.RelationTo = userRelation.Relation.ToString();
 
@@ -61,11 +66,8 @@ namespace DatingApp.Services
 
             var users = _unitOfWork.UserRepository.GetMembers(userParams);
 
-            // TODO: UserRelationSrvice method to get blocked relations from both sides
-            var blocked = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = user.Id, Predicate = "blocked" });
-            var blockedBy = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = user.Id, Predicate = "blockedBy" });
-            var blockedIDs = blocked.Select(u => u.Id).Union(blockedBy.Select(u => u.Id));
-             
+            var blockedIDs = await _userRelationService.GetBlockedRelationsIds(user.Id);
+
             users = users.Where(u => !blockedIDs.Contains(u.Id));
 
             return await PagedList<MemberDto>.CreateAsync(users.ProjectTo<MemberDto>(

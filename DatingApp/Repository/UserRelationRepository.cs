@@ -28,6 +28,13 @@ namespace DatingApp.Repository
                 .FirstOrDefaultAsync(r => r.SourceUser.UserName == sourceUsername && r.RelatedUser.UserName == relatedUsername);
         }
 
+        public async Task<IEnumerable<UserRelation>> GetBlockedRelations(int userId)
+        {
+            return await _context.UserRelations
+                .Where(r => r.Relation == RelationStatus.BLOCKED && (r.SourceUserId == userId || r.RelatedUserId == userId))
+                .ToListAsync();
+        }
+
         public async Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams)
         {
             var users = _context.Users.OrderBy(u => u.UserName).AsQueryable();
@@ -74,5 +81,6 @@ namespace DatingApp.Repository
                 .Include(u => u.RelationToUsers)
                 .FirstOrDefaultAsync(u => u.UserName == username);
         }
+
     }
 }

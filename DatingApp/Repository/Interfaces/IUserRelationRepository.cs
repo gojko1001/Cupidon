@@ -8,6 +8,7 @@ namespace DatingApp.Repository.Interfaces
     {
         Task<UserRelation> GetUserRelation(int sourceUserId, int relatedUserId);
         Task<UserRelation> GetUserRelation(string sourceUsername, string relatedUsername);
+        Task<IEnumerable<UserRelation>> GetBlockedRelations(int userId);
         Task<AppUser> GetUserWithRelations(string username);
         Task<PagedList<RelationDto>> GetUserRelations(RelationParams relationParams);
     }

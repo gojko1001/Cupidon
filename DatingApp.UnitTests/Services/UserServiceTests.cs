@@ -4,11 +4,13 @@ using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services;
+using DatingApp.Services.interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatingApp.UnitTests.Services
@@ -18,23 +20,25 @@ namespace DatingApp.UnitTests.Services
     {
         private Mock<IUnitOfWork> _unitOfWork;
         private Mock<IMapper> _mapper;
+        private Mock<IUserRelationService> _userRelationService;
         private Mock<UserManager<AppUser>> _userManager;
         private Mock<SignInManager<AppUser>> _signInManager;
         private UserService _userService;
 
-        private AppUser _testUser = new AppUser { Id = 1, UserName = "alice"};
+        private AppUser _testUser = new() { Id = 1, UserName = "alice"};
 
         [SetUp]
         public void SetUp()
         {
             _unitOfWork = new Mock<IUnitOfWork>();
             _mapper = new Mock<IMapper>();
+            _userRelationService = new Mock<IUserRelationService>();
             _userManager = MockUserManager<AppUser>();
             _signInManager = MockSignInManager<AppUser>();
 
-            _userService = new UserService(_unitOfWork.Object, _mapper.Object, _userManager.Object, _signInManager.Object);
+            _userService = new UserService(_unitOfWork.Object, _mapper.Object, _userRelationService.Object, _userManager.Object, _signInManager.Object);
         }
-
+            
         [Test]
         public async Task UpdateUser_WhenCalled_SaveChangesToDB()
         {

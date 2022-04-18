@@ -12,13 +12,15 @@ namespace DatingApp.Services
     public class MessageService : IMessageService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IUserRelationService _userRelationService;
         private readonly IHubContext<PresenceHub> _presenceHub;
         private readonly PresenceTracker _tracker;
 
-        public MessageService(IUnitOfWork unitOfWork,
+        public MessageService(IUnitOfWork unitOfWork, IUserRelationService userRelationService,
             IHubContext<PresenceHub> presenceHub, PresenceTracker tracker)
         {
             _unitOfWork = unitOfWork;
+            _userRelationService = userRelationService;
             _presenceHub = presenceHub;
             _tracker = tracker;
         }
@@ -27,9 +29,7 @@ namespace DatingApp.Services
         {
             var messages = _unitOfWork.MessageRepository.GetMessagesForUser(messageParams);
 
-            var blocked = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = messageParams.UserId, Predicate = "blocked" });
-            var blockedBy = await _unitOfWork.UserRelationRepository.GetUserRelations(new RelationParams { UserId = messageParams.UserId, Predicate = "blockedBy" });
-            var blockedIDs = blocked.Select(u => u.Id).Union(blockedBy.Select(u => u.Id));
+            var blockedIDs = await _userRelationService.GetBlockedRelationsIds(messageParams.UserId);
 
             messages = messages.Where(m => !blockedIDs.Contains(m.SenderId) && !blockedIDs.Contains(m.RecipientId));
 

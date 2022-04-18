@@ -3,6 +3,7 @@ using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services;
+using DatingApp.Services.interfaces;
 using DatingApp.SignalR;
 using DatingApp.Utils.Pagination;
 using Microsoft.AspNetCore.SignalR;
@@ -19,6 +20,7 @@ namespace DatingApp.UnitTests.Services
     {
         private MessageService _messageService;
         private Mock<IUnitOfWork> _unitOfWork;
+        private Mock<IUserRelationService> _userRelationService;
         private Mock<IHubContext<PresenceHub>> _presenceHub;
         private Mock<PresenceTracker> _presenceTracker;
 
@@ -28,10 +30,11 @@ namespace DatingApp.UnitTests.Services
         public void SetUp()
         {
             _unitOfWork = new Mock<IUnitOfWork>();
+            _userRelationService = new Mock<IUserRelationService>();
             _presenceHub = new Mock<IHubContext<PresenceHub>>();
             _presenceTracker = new Mock<PresenceTracker>();
 
-            _messageService = new MessageService(_unitOfWork.Object, _presenceHub.Object, _presenceTracker.Object);
+            _messageService = new MessageService(_unitOfWork.Object, _userRelationService.Object, _presenceHub.Object, _presenceTracker.Object);
 
             _unitOfWork.Setup(u => u.UserRelationRepository.GetUserRelation(_createMessageDto.SenderUsername, _createMessageDto.RecipientUsername)).ReturnsAsync((UserRelation)null);
             _unitOfWork.Setup(u => u.UserRelationRepository.GetUserRelation(_createMessageDto.RecipientUsername, _createMessageDto.SenderUsername)).ReturnsAsync((UserRelation)null);
@@ -43,6 +46,7 @@ namespace DatingApp.UnitTests.Services
         {
             var messageParams = new MessageParams();
             _unitOfWork.Setup(u => u.MessageRepository.GetMessagesForUser(It.IsAny<MessageParams>())).Verifiable();
+            _userRelationService.Setup(r => r.GetBlockedRelationsIds(It.IsAny<int>())).ReturnsAsync(new List<int>());
 
             await _messageService.GetMessagesForUser(messageParams);
 
