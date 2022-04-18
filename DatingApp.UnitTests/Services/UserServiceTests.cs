@@ -52,7 +52,7 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void EditRoles_UserDoesntExist_ThrowInvalidActionException()
+        public void EditRoles_UserDoesNotExist_ThrowInvalidActionException()
         {
             _userManager.Setup(mgr => mgr.FindByNameAsync(It.IsAny<string>())).Verifiable();
 
@@ -76,7 +76,7 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void ChangePassword_UserDoesntExist_ThrowUnauthorizedException()
+        public void ChangePassword_UserDoesNotExist_ThrowUnauthorizedException()
         {
             _unitOfWork.Setup(u => u.UserRepository.GetUserById(It.IsAny<int>(), It.IsAny<bool>())).Verifiable();
 
@@ -146,7 +146,7 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void Login_UserDoesntExist_ThrowUnauthorizedException()
+        public void Login_UserDoesNotExist_ThrowUnauthorizedException()
         {
             var loginDto = new LoginDto
             {

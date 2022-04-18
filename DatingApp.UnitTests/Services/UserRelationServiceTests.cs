@@ -150,9 +150,9 @@ namespace DatingApp.UnitTests.Services
         }
 
         [Test]
-        public void RemoveRelation_RelationNotExists_ThrowInvalidActionException()
+        public void RemoveRelation_RelationDoesNotExist_ThrowInvalidActionException()
         {
-            Assert.That(async () => await _relationService.AddBlock(SOURCE_USER, RELATED_USER), Throws.Exception.TypeOf<InvalidActionException>());
+            Assert.That(async () => await _relationService.RemoveRelation(SOURCE_USER, RELATED_USER), Throws.Exception.TypeOf<InvalidActionException>());
         }
 
 

@@ -67,7 +67,7 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to like user!");
+            throw new ServerErrorException("Failed to like user!");
         }
 
         public async Task AddBlock(string sourceUsername, string blockedUsername)
@@ -108,7 +108,7 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to block user!");
+            throw new ServerErrorException("Failed to block user!");
         }
 
         public async Task RemoveRelation(string sourceUsername, string relatedUsername)
@@ -131,7 +131,7 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to remove relation!");
+            throw new ServerErrorException("Failed to remove relation!");
         }
 
     }

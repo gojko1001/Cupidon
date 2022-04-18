@@ -97,7 +97,7 @@ namespace DatingApp.Services
             _unitOfWork.UserRepository.Update(user);
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to update user info");
+            throw new ServerErrorException("Failed to update user info");
         }
 
         public async Task<IEnumerable<string>> EditRoles(string username, string[] roles)

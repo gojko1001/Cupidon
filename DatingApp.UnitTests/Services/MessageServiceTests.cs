@@ -162,7 +162,7 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void RemoveMessage_MessageDoesntExist_ThrowInvalidActionException()
+        public void RemoveMessage_MessageDoesNotExist_ThrowInvalidActionException()
         {
             _unitOfWork.Setup(u => u.MessageRepository.GetMessage(1)).ReturnsAsync((Message)null);
 

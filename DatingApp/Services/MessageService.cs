@@ -119,7 +119,7 @@ namespace DatingApp.Services
                 _unitOfWork.MessageRepository.RemoveMessage(message);
             if (await _unitOfWork.Complete())
                 return message;
-            throw new InvalidActionException("Failed to delete message");
+            throw new ServerErrorException("Failed to delete message");
         }
 
 

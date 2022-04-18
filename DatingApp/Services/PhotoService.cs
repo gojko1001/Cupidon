@@ -35,11 +35,9 @@ namespace DatingApp.Services
             user.Photos.Add(photo);
 
             if (await _unitOfWork.Complete())
-            {
                 return photo;
-            }
 
-            throw new InvalidActionException("Error while adding new photo!");
+            throw new ServerErrorException("Error while adding new photo!");
         }
 
         public async Task SetMainPhoto(int photoId, int userId)
@@ -62,7 +60,7 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to set main photo");
+            throw new ServerErrorException("Failed to set main photo");
         }
 
         public async Task RemovePhoto(int photoId, int userId)
@@ -84,7 +82,7 @@ namespace DatingApp.Services
             user.Photos.Remove(photo);
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to delete photo");
+            throw new ServerErrorException("Failed to delete photo");
         }
 
         public Task<IEnumerable<PhotoForApprovalDto>> GetUnapprovedPhotos()
@@ -108,7 +106,7 @@ namespace DatingApp.Services
 
             if(await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to approve photo");
+            throw new ServerErrorException("Failed to approve photo");
         }
 
         public async Task RejectPhoto(int photoId)
@@ -129,7 +127,7 @@ namespace DatingApp.Services
 
             if (await _unitOfWork.Complete())
                 return;
-            throw new InvalidActionException("Failed to delete photo");
+            throw new ServerErrorException("Failed to delete photo");
         }
     }
 }
