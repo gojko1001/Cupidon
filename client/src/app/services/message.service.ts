@@ -6,6 +6,7 @@ import { take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Group } from '../model/group';
 import { Message } from '../model/message';
+import { BusyService } from './busy.service';
 import { getPaginatedResult, getPaginationHeaders } from './paginationUtil';
 import { getAccessToken } from './tokenUtil';
 
@@ -19,9 +20,11 @@ export class MessageService {
   private messageThreadSource = new BehaviorSubject<Message[]>([]);
   messageThread$ = this.messageThreadSource.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private busyService: BusyService) { }
 
   createHubConnection(otherUsername: string){
+    this.busyService.busy()
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(this.messageHubUrl + "?user=" + otherUsername, {
         accessTokenFactory: () => getAccessToken()
@@ -29,7 +32,9 @@ export class MessageService {
       .withAutomaticReconnect()
       .build();
     
-    this.hubConnection.start().catch(error => {console.log(error)});
+    this.hubConnection.start()
+      .catch(error => {console.log(error)})
+      .finally(() => this.busyService.idle());
 
     this.hubConnection.on("ReceiveMessageThread", messages => {
       this.messageThreadSource.next(messages);
@@ -57,6 +62,7 @@ export class MessageService {
 
   stopHubConnection(){
     if(this.hubConnection){
+      this.messageThreadSource.next([]);
       this.hubConnection.stop();
     }
   }

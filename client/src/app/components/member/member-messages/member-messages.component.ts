@@ -14,6 +14,7 @@ export class MemberMessagesComponent implements OnInit {
 
   username = this.route.snapshot.paramMap.get('username');
   messageContent: string;
+  loading = false;
 
   constructor(public messageService: MessageService,
               private route: ActivatedRoute) { }
@@ -22,9 +23,10 @@ export class MemberMessagesComponent implements OnInit {
   }
 
   sendMessage(){
+    this.loading = true;
     this.messageService.sendMessage(this.username, this.messageContent).then(() => {
       this.messageForm.reset();
-    });
+    }).finally(() => this.loading = false);
   }
 
 }
