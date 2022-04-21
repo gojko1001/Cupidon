@@ -8,6 +8,7 @@ export interface User {
     knownAs: string;
     gender: string;
     roles: string[];
+    publicActivity: boolean;
 }
 
 
@@ -26,6 +27,7 @@ export interface Member {
     city: string;
     country: string;
     relationTo?: string;
+    publicActivity?: boolean;
     photos: Photo[];
 }
 

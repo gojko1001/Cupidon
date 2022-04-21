@@ -20,11 +20,6 @@ namespace DatingApp.Repository
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<AppUser>> GetAll()
-            => await _context.Users
-            .Include(p => p.Photos)
-            .ToListAsync();
-
 
         public IQueryable<MemberDto> GetMember(string username, bool isCurrentUser)
         {
@@ -37,15 +32,16 @@ namespace DatingApp.Repository
             return query;
         }
 
-        public IQueryable<AppUser> GetMembers(UserParams userParams)
+        public IQueryable<MemberDto> GetMembers(UserParams userParams)
         {
             var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
             var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
-            
+
             var query = _context.Users.AsQueryable()
                 .Where(u => u.UserName != userParams.CurrentUsername)
                 .Where(u => u.Gender == userParams.Gender)
-                .Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+                .Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob)
+                .ProjectTo<MemberDto>(_mapper.ConfigurationProvider);
             query = userParams.OrderBy switch
             {
                 "created" => query.OrderByDescending(u => u.Created),

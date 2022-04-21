@@ -46,7 +46,7 @@ export class AccountService {
     const roles = getDecodedToken(user.token).role;
     Array.isArray(roles) ? user.roles = roles : user.roles.push(roles);
 
-    let userInfo = {username: user.username, knownAs: user.knownAs, profilePhotoUrl: user.profilePhotoUrl, gender: user.gender, roles: user.roles}
+    let userInfo = {username: user.username, knownAs: user.knownAs, profilePhotoUrl: user.profilePhotoUrl, gender: user.gender, roles: user.roles, publicActivity: user.publicActivity}
     localStorage.setItem('user', JSON.stringify(userInfo));
     setAccessToken(user.token)
     setRefreshToken(user.refreshToken)

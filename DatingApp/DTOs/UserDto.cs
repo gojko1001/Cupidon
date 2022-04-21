@@ -8,5 +8,6 @@
         public string ProfilePhotoUrl { get; set; }
         public string KnownAs { get; set; }
         public string Gender { get; set; }
+        public bool PublicActivity { get; set; }
     }
 }

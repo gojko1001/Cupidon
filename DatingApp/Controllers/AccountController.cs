@@ -58,7 +58,8 @@ namespace DatingApp.Controllers
                 Token = await _tokenService.GenerateJwtToken(user),
                 RefreshToken = _tokenService.GenerateRefreshToken(user),
                 KnownAs = user.KnownAs,
-                Gender = user.Gender
+                Gender = user.Gender,
+                PublicActivity = user.PublicActivity
             };
     }
 }
