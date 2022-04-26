@@ -1,5 +1,5 @@
 export function getDecodedToken(token: string){
-    return JSON.parse(atob(token.split('.')[1]));
+    return JSON.parse(window.atob(token.split('.')[1]));
 }
 
 export function signOut(): void {

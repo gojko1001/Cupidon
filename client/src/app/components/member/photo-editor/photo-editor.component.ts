@@ -5,7 +5,7 @@ import { Photo } from 'src/app/model/photo';
 import { Member, User } from 'src/app/model/user';
 import { AccountService } from 'src/app/services/account.service';
 import { MembersService } from 'src/app/services/members.service';
-import { getAccessToken, getRefreshToken } from 'src/app/services/tokenUtil';
+import { getAccessToken } from 'src/app/services/tokenUtil';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -32,10 +32,7 @@ export class PhotoEditorComponent implements OnInit {
   setMainPhoto(photo: Photo){
     this.memberService.setMainPhoto(photo.id).subscribe(() => {
       this.user.profilePhotoUrl = photo.url;
-
-      this.user.token = getAccessToken();
-      this.user.refreshToken = getRefreshToken();
-      this.accountService.setCurrentUser(this.user);
+      this.accountService.updateCurrentUser(this.user);
       
       this.member.photoUrl = photo.url;
       this.member.photos.forEach(p => {
@@ -79,7 +76,7 @@ export class PhotoEditorComponent implements OnInit {
         if(photo.isMain){
           this.user.profilePhotoUrl = photo.url;
           this.member.photoUrl = photo.url;
-          this.accountService.setCurrentUser(this.user);
+          this.accountService.updateCurrentUser(this.user);
         }
       }
     }

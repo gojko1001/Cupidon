@@ -51,7 +51,8 @@ describe('NavbarComponent', () => {
       knownAs: 'test',
       profilePhotoUrl : '',
       gender: '',
-      roles: []
+      roles: [],
+      publicActivity: true
     }
 
     beforeEach(() => {

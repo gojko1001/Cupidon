@@ -11,22 +11,22 @@ import { getAccessToken, getRefreshToken } from './services/tokenUtil';
 })
 export class AppComponent implements OnInit{
   title = 'The Dating App';
-  users: any;
   
   constructor(private accountService: AccountService, 
               private presence: PresenceService) {}
   
   ngOnInit(): void {
-    this.setCurrentUser();
+    this.loadCurrentUser();
   }
 
-  setCurrentUser(){
+  loadCurrentUser(){
     const user: User = JSON.parse(localStorage.getItem('user'));
     if(user){
       user.token = getAccessToken();
       user.refreshToken = getRefreshToken();
       this.accountService.setCurrentUser(user);
-      this.presence.createHubConnection();
+      if(user.publicActivity)
+        this.presence.createHubConnection();
     }
   }
 }

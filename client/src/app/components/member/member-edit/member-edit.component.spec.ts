@@ -56,7 +56,8 @@ describe('MemberEditComponent', () => {
       profilePhotoUrl: testMember.photoUrl,
       knownAs: testMember.knownAs,
       gender: testMember.gender,
-      roles: []
+      roles: [],
+      publicActivity: true
     }
 
     memberService = fixture.debugElement.injector.get(MembersService);

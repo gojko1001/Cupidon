@@ -18,7 +18,8 @@ describe('UserManagementComponent', () => {
     roles: ["Member"],
     gender: '',
     knownAs: '',
-    profilePhotoUrl: ''
+    profilePhotoUrl: '',
+    publicActivity: null
   }
 
   let user2: User = {
@@ -26,7 +27,8 @@ describe('UserManagementComponent', () => {
     roles: ["Moderator"],
     gender: '',
     knownAs: '',
-    profilePhotoUrl: ''
+    profilePhotoUrl: '',
+    publicActivity: null
   }
 
   let user3: User = {
@@ -34,7 +36,8 @@ describe('UserManagementComponent', () => {
     roles: ["Member", "Moderator"],
     gender: '',
     knownAs: '',
-    profilePhotoUrl: ''
+    profilePhotoUrl: '',
+    publicActivity: null
   }
 
   let testUsers: User[] = []
