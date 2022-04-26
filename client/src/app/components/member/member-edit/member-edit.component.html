@@ -33,6 +33,11 @@
         <tabset class="member-tabset">
             <tab heading="About {{member.knownAs}}">
                 <form #editForm="ngForm" id="editForm" (ngSubmit)="updateMember()">
+                    <h4>Privacy</h4>
+                    <div class="form-check">
+                        <input class="form-check-input" [(ngModel)]="member.publicActivity" type="checkbox" name="publicActivity">
+                        <label class="form-check-label">Display Activity Status</label>
+                    </div>
                     <h4>Description</h4>
                     <textarea class="form-control" [(ngModel)]="member.introduction" name="introduction" cols=auto rows="6"></textarea>
                     <h4 class="mt-2">Looking for</h4>

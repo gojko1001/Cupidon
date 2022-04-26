@@ -11,6 +11,7 @@
     "Interests": "Quis eu nisi officia cupidatat.",
     "City": "Lindcove",
     "Country": "Antarctica",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/women/73.jpg",
@@ -31,6 +32,7 @@
     "Interests": "Laboris sint ex voluptate nostrud aliquip do tempor ex labore in elit sunt ut.",
     "City": "Ellerslie",
     "Country": "Tanzania",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/women/11.jpg",
@@ -51,6 +53,7 @@
     "Interests": "Labore quis id minim irure sit eu enim et velit quis qui dolor ad.",
     "City": "Belva",
     "Country": "Finland",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/women/64.jpg",
@@ -71,6 +74,7 @@
     "Interests": "Cupidatat consequat esse nulla dolor elit dolore quis.",
     "City": "Williamson",
     "Country": "Hungary",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/women/1.jpg",
@@ -91,6 +95,7 @@
     "Interests": "Duis laborum magna nisi nisi occaecat aute pariatur aute exercitation.",
     "City": "Sardis",
     "Country": "Saint Kitts and Nevis",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/women/64.jpg",
@@ -111,6 +116,7 @@
     "Interests": "Voluptate non ut nulla magna labore ipsum sint magna.",
     "City": "Delco",
     "Country": "Macedonia",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/men/17.jpg",
@@ -131,6 +137,7 @@
     "Interests": "Aliqua incididunt dolore velit do officia eu.",
     "City": "Lafferty",
     "Country": "Eritrea",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/men/19.jpg",
@@ -151,6 +158,7 @@
     "Interests": "Dolor Lorem excepteur commodo eiusmod dolore eiusmod officia officia pariatur.",
     "City": "Mappsville",
     "Country": "Albania",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/men/25.jpg",
@@ -171,6 +179,7 @@
     "Interests": "Officia aliquip consequat aliquip nulla irure.",
     "City": "Winesburg",
     "Country": "Hong Kong",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/men/31.jpg",
@@ -191,6 +200,7 @@
     "Interests": "Incididunt culpa veniam nisi sint ex quis veniam tempor ipsum.",
     "City": "Loveland",
     "Country": "Wallis and Futuna Islands",
+    "PublicActivity": true,
     "Photos": [
       {
         "Url": "https://randomuser.me/api/portraits/men/24.jpg",

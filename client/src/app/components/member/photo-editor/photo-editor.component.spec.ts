@@ -76,7 +76,8 @@ describe('PhotoEditorComponent', () => {
       profilePhotoUrl: testMember.photoUrl,
       knownAs: testMember.knownAs,
       gender: testMember.gender,
-      roles: []
+      roles: [],
+      publicActivity: true
     }
     accService = fixture.debugElement.injector.get(AccountService)
     memberService = fixture.debugElement.injector.get(MembersService)

@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Errors;
@@ -30,33 +29,45 @@ namespace DatingApp.Services
         }
 
 
-        public async Task<MemberDto> GetUser(string username, string requestingUser)
+        public async Task<MemberDto> GetUser(string username, string requestingUsername)
         {
-            var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUser);
-            if(invertedRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
+            if (username == requestingUsername)
+                return await GetSelfInfo(username);
+            else
+                return await GetRequestedUserInfo(username, requestingUsername);
+        }
+        
+        private async Task<MemberDto> GetSelfInfo(string username)
+        {
+            var member = await _unitOfWork.UserRepository.GetMember(username, true).FirstOrDefaultAsync();
+            if(member == null) throw new NotFoundException("User not found");
+            return member;
+        }
+
+        
+        private async Task<MemberDto> GetRequestedUserInfo(string username, string requestingUsername)
+        {
+            var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUsername);
+            if (invertedRelation != null && invertedRelation.Relation == RelationStatus.BLOCKED)
                 throw new NotFoundException("User not found");
 
-            var userQuery = _unitOfWork.UserRepository.GetMember(username, username == requestingUser);
-            var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(requestingUser, username);
-            if(userRelation != null && userRelation.Relation == RelationStatus.BLOCKED)
-            {
-                userQuery = userQuery.Select(u => new MemberDto
-                {
-                    Id = u.Id,
-                    Age = u.Age,
-                    Username = u.Username,
-                    KnownAs = u.KnownAs,
-                    PhotoUrl = u.PhotoUrl,
-                });
-            }
+            var userQuery = _unitOfWork.UserRepository.GetMember(username, false);
+            var userRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(requestingUsername, username);
+
+            if (userRelation != null && userRelation.Relation == RelationStatus.BLOCKED)
+                userQuery = userQuery.Select(MemberDto.BlockedUserSelector);
+            else
+                userQuery = userQuery.Select(MemberDto.NonLogedUserSelector);
+
             var user = userQuery.FirstOrDefault();
             if (user == null) throw new NotFoundException("User not found");
 
-            if(userRelation != null)
+            if (userRelation != null)
                 user.RelationTo = userRelation.Relation.ToString();
 
             return user;
         }
+
 
         public async Task<PagedList<MemberDto>> GetUsers(UserParams userParams)
         {
@@ -68,10 +79,11 @@ namespace DatingApp.Services
 
             var blockedIDs = await _userRelationService.GetBlockedRelationsIds(user.Id);
 
-            users = users.Where(u => !blockedIDs.Contains(u.Id));
+            users = users
+                .Select(MemberDto.NonLogedUserSelector)
+                .Where(u => !blockedIDs.Contains(u.Id));
 
-            return await PagedList<MemberDto>.CreateAsync(users.ProjectTo<MemberDto>(
-                _mapper.ConfigurationProvider).AsNoTracking(),
+            return await PagedList<MemberDto>.CreateAsync(users.AsNoTracking(),
                 userParams.PageNumber, userParams.PageSize);
         }
 

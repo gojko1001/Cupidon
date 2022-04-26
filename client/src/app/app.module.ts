@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, NO_ERRORS_SCHEMA } from '@angular/core';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -77,6 +77,7 @@ import { PasswordChangeComponent } from './components/member/password-change/pas
   ],
   bootstrap: [AppComponent],
   schemas:[
+    NO_ERRORS_SCHEMA,
     CUSTOM_ELEMENTS_SCHEMA  // Added to suppress ngx gallery warning
   ]
 })

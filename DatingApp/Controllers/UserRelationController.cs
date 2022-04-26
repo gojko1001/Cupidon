@@ -20,7 +20,7 @@ namespace DatingApp.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RelationDto>>> GetUserLikes([FromQuery]RelationParams relationParams)
+        public async Task<ActionResult<IEnumerable<RelationDto>>> GetUserRelations([FromQuery]RelationParams relationParams)
         {
             relationParams.UserId = User.GetId();
             PagedList<RelationDto> users = await _relationService.GetUserRelations(relationParams);
