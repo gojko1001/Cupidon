@@ -8,20 +8,11 @@ import { AccountService } from '../../services/account.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
-  creds: { username: string, password: string };
 
   constructor(public accountService: AccountService,
               private router: Router) { }
 
   ngOnInit(): void {
-    this.creds = { username: '', password: '' };
-  }
-
-  login(){
-    this.accountService.login(this.creds).subscribe(() => {
-      this.router.navigateByUrl('/members');
-      this.creds = { username: '', password: '' };
-    })
   }
 
   logout(){

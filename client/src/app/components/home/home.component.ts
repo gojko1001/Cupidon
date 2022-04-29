@@ -10,11 +10,13 @@ import { AccountService } from 'src/app/services/account.service';
 })
 export class HomeComponent implements OnInit {
   registerMode = false;
+  creds: { username: string, password: string };
 
   constructor(private accountService: AccountService,
               private router: Router) { }
 
   ngOnInit(): void {
+    this.creds = { username: '', password: '' };
   }
 
   registerToggle(){
@@ -23,6 +25,13 @@ export class HomeComponent implements OnInit {
 
   cancelRegisterMode(event: boolean){
     this.registerMode = event;
+  }
+
+  login(){
+    this.accountService.login(this.creds).subscribe(() => {
+      this.router.navigateByUrl('/members');
+      this.creds = { username: '', password: '' };
+    })
   }
 
   signInGoogle(){
@@ -37,9 +46,5 @@ export class HomeComponent implements OnInit {
         this.router.navigateByUrl('/members');
       })
     }, error => console.log(error))
-  }
-
-  signOut(){
-    this.accountService.logout();
   }
 }
