@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { GoogleLoginProvider, SocialAuthService } from 'angularx-social-login';
 import { ReplaySubject } from 'rxjs';
 import { map } from 'rxjs/operators'
 import { environment } from 'src/environments/environment';
@@ -17,6 +18,7 @@ export class AccountService {
   currentUser$ = this.currentUserSource.asObservable();
 
   constructor(private http: HttpClient,
+              private socialAuth: SocialAuthService,
               private presence: PresenceService) { }
 
   register(regDetails: any){
@@ -67,10 +69,36 @@ export class AccountService {
     this.currentUserSource.next(userInfo);
   }
 
+  
   logout(){
     signOut();
     this.currentUserSource.next(null);
     this.presence.stopHubConnection();
+    this.socialAuth.authState.subscribe((user) => {
+      if(user)
+        this.socialAuth.signOut().then(() => {
+          this.socialAuth.authState.subscribe((user) => {
+            console.log(user);
+          })
+        });
+    })
+  }
+
+  signInGoogle(){
+    // let scope = 'https://www.googleapis.com/auth/user.gender.read https://www.googleapis.com/auth/user.birthday.read';   To request gender and birthday
+    return this.socialAuth.signIn(GoogleLoginProvider.PROVIDER_ID, {prompt: 'consent'})
+  }
+
+  loginGoogle(body: any){
+    return this.http.post(this.accountUrl + "login/google", body).pipe(
+      map((user: any) => {
+        if(user) {
+          this.setCurrentUser(user);
+          if(user.publicActivity)
+            this.presence.createHubConnection();
+        }
+      })
+    )
   }
 
   changePassword(passwordChange: any){

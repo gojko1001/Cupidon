@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { GoogleLoginProvider, SocialAuthServiceConfig, SocialLoginModule } from 'angularx-social-login';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -17,6 +18,8 @@ import { MessagesComponent } from './components/messages/messages.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { MemberCardComponent } from './components/member/member-card/member-card.component';
 import { MemberEditComponent } from './components/member/member-edit/member-edit.component';
+import { MemberMessagesComponent } from './components/member/member-messages/member-messages.component';
+import { PasswordChangeComponent } from './components/member/password-change/password-change.component';
 import { PhotoEditorComponent } from './components/member/photo-editor/photo-editor.component';
 import { ServerErrorComponent } from './components/server-error/server-error.component';
 
@@ -24,16 +27,16 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { LoadingInterceptor } from './interceptors/loading.interceptor';
 import { SharedModule } from './modules/shared.module';
+import { HasRoleDirective } from './directives/has-role.directive';
 import { TextInputComponent } from './components/forms/text-input/text-input.component';
 import { DateInputComponent } from './components/forms/date-input/date-input.component';
-import { MemberMessagesComponent } from './components/member/member-messages/member-messages.component';
 import { AdminPanelComponent } from './components/admin/admin-panel/admin-panel.component';
-import { HasRoleDirective } from './directives/has-role.directive';
 import { UserManagementComponent } from './components/admin/user-management/user-management.component';
 import { PhotoManagementComponent } from './components/admin/photo-management/photo-management.component';
 import { RolesModalComponent } from './components/modals/roles-modal/roles-modal.component';
 import { ConfirmDialogComponent } from './components/modals/confirm-dialog/confirm-dialog.component';
-import { PasswordChangeComponent } from './components/member/password-change/password-change.component';
+import { environment } from 'src/environments/environment';
+
 
 @NgModule({
   declarations: [
@@ -68,12 +71,27 @@ import { PasswordChangeComponent } from './components/member/password-change/pas
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    SharedModule
+    SharedModule,
+    SocialLoginModule
   ],
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true},    
     {provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true},    
-    {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true}    
+    {provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true},
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: false,
+        providers: [
+          {
+            id: GoogleLoginProvider.PROVIDER_ID,
+            provider: new GoogleLoginProvider(
+              environment.googleClientId
+            )
+          },
+        ],
+      } as SocialAuthServiceConfig
+    }   
   ],
   bootstrap: [AppComponent],
   schemas:[

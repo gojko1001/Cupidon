@@ -5,6 +5,7 @@ using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils.Pagination;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +45,6 @@ namespace DatingApp.Services
             return member;
         }
 
-        
         private async Task<MemberDto> GetRequestedUserInfo(string username, string requestingUsername)
         {
             var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUsername);
@@ -156,6 +156,7 @@ namespace DatingApp.Services
 
             var user = _mapper.Map<AppUser>(registerDto);
             user.UserName = registerDto.Username.ToLower();
+            user.PublicActivity = true;
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
@@ -179,6 +180,48 @@ namespace DatingApp.Services
             if (!result.Succeeded)
                 throw new UnauthorizedException("Invalid username or password!");
 
+            return user;
+        }
+
+        public async Task<AppUser> LoginGoogle(ExternalAuthDto externalAuthDto, GoogleJsonWebSignature.Payload payload)
+        {
+            var loginInfo = new UserLoginInfo(externalAuthDto.Provider, payload.Subject, externalAuthDto.Provider);
+            var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+            if (user == null)
+            {
+                user = await _userManager.FindByEmailAsync(payload.Email);
+
+                if (user == null)
+                {
+                    user = await RegisterGoogle(payload, loginInfo);
+                }
+                else
+                {
+                    await _userManager.AddLoginAsync(user, loginInfo);
+                }
+
+                if (user == null)
+                    throw new InvalidActionException("Invalid External Authentication.");
+            }
+
+            if (user.Photos == null)
+                user.Photos = new List<Photo>();
+            return user;
+        }
+
+        private async Task<AppUser> RegisterGoogle(GoogleJsonWebSignature.Payload payload, UserLoginInfo loginInfo)
+        {
+            AppUser user = new()
+            {
+                UserName = payload.Email,
+                Email = payload.Email,
+                KnownAs = payload.GivenName,
+                PublicActivity = true
+            };
+            await _userManager.CreateAsync(user);
+
+            await _userManager.AddToRoleAsync(user, "Member");
+            await _userManager.AddLoginAsync(user, loginInfo);
             return user;
         }
     }

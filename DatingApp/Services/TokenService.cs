@@ -1,6 +1,8 @@
 ﻿using DatingApp.DTOs;
 using DatingApp.Entities;
+using DatingApp.Errors;
 using DatingApp.Services.interfaces;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,11 +16,13 @@ namespace DatingApp.Services
     public class TokenService : ITokenService
     {
         private readonly SymmetricSecurityKey _key;
+        private readonly IConfiguration _googleSettings;
         private readonly UserManager<AppUser> _userManager;
 
         public TokenService(IConfiguration config, UserManager<AppUser> userManager)
         {
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
+            _googleSettings = config.GetSection("Authentication:Google");
             _userManager = userManager;
         }
 
@@ -77,6 +81,23 @@ namespace DatingApp.Services
                 AccessToken = await GenerateJwtToken(user),
                 RefreshToken = GenerateRefreshToken(user)
             };
+        }
+
+        public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(ExternalAuthDto externalAuth)
+        {
+            try
+            {
+                var settings = new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new List<string>() { _googleSettings.GetSection("clientId").Value }
+                };
+                var payload = await GoogleJsonWebSignature.ValidateAsync(externalAuth.IdToken, settings);
+                return payload;
+            }
+            catch (Exception)
+            {
+                throw new ServerErrorException("Required to login to google first");
+            }
         }
 
 

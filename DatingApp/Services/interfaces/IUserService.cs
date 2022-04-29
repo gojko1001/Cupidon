@@ -1,6 +1,8 @@
 ﻿using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Utils.Pagination;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Identity;
 
 namespace DatingApp.Services.interfaces
 {
@@ -14,5 +16,6 @@ namespace DatingApp.Services.interfaces
         Task<IEnumerable<string>> EditRoles(string username, string[] roles);
         Task<AppUser> Register(RegisterDto registerDto);
         Task<AppUser> Login(LoginDto loginDto);
+        Task<AppUser> LoginGoogle(ExternalAuthDto externalAuthDto, GoogleJsonWebSignature.Payload payload);
     }
 }
