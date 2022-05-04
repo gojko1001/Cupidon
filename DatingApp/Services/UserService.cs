@@ -149,7 +149,7 @@ namespace DatingApp.Services
 
         public async Task<AppUser> Register(RegisterDto registerDto)
         {
-            if (await _unitOfWork.UserRepository.UserExists(registerDto.Username))
+            if (await _unitOfWork.UserRepository.UserExists(registerDto.Username))  // User manager gives a result error if username already exists
             {
                 throw new InvalidActionException("Username already exists!");
             }
@@ -189,7 +189,7 @@ namespace DatingApp.Services
             var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
             if (user == null)
             {
-                user = await _userManager.FindByEmailAsync(payload.Email);
+                user = await _unitOfWork.UserRepository.GetUserByEmail(payload.Email);
 
                 if (user == null)
                 {
@@ -202,6 +202,9 @@ namespace DatingApp.Services
 
                 if (user == null)
                     throw new InvalidActionException("Invalid External Authentication.");
+            } else
+            {
+                user = await _unitOfWork.UserRepository.GetUserByEmail(payload.Email);
             }
 
             if (user.Photos == null)

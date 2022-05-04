@@ -85,8 +85,14 @@ export class AccountService {
   }
 
   signInGoogle(){
-    // let scope = 'https://www.googleapis.com/auth/user.gender.read https://www.googleapis.com/auth/user.birthday.read';   To request gender and birthday
-    return this.socialAuth.signIn(GoogleLoginProvider.PROVIDER_ID, {prompt: 'consent'})
+    let scope = 'https://www.googleapis.com/auth/user.gender.read https://www.googleapis.com/auth/user.birthday.read';   // To request gender and birthday
+    return this.socialAuth.signIn(GoogleLoginProvider.PROVIDER_ID, {prompt: 'consent', scope: scope}).then((res: any) => {
+      this.http.get(`https://people.googleapis.com/v1/people/${res.id}?personFields=birthdays,genders`, {headers: {Authorization: 'Bearer ' + res.authToken}})
+      .subscribe(result => {
+        console.log(result)
+      })
+      return res;
+    });
   }
 
   loginGoogle(body: any){
