@@ -106,10 +106,9 @@ namespace DatingApp.Services
             var user = await _unitOfWork.UserRepository.GetUserByUsername(username);
 
             _mapper.Map(memberUpdateDto, user);
-            _unitOfWork.UserRepository.Update(user);
-            if (await _unitOfWork.Complete())
-                return;
-            throw new ServerErrorException("Failed to update user info");
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                throw new InvalidActionException(FormatErrorMessage(result));
         }
 
         public async Task<IEnumerable<string>> EditRoles(string username, string[] roles)
@@ -144,27 +143,22 @@ namespace DatingApp.Services
 
             var changeResult = await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.Password);
             if (changeResult.Errors.Any())
-                throw new InvalidActionException(string.Join(Environment.NewLine, changeResult.Errors.Select(e => e.Description)));
+                throw new InvalidActionException(FormatErrorMessage(changeResult));
         }
 
         public async Task<AppUser> Register(RegisterDto registerDto)
         {
-            if (await _unitOfWork.UserRepository.UserExists(registerDto.Username))  // User manager gives a result error if username already exists
-            {
-                throw new InvalidActionException("Username already exists!");
-            }
-
             var user = _mapper.Map<AppUser>(registerDto);
             user.UserName = registerDto.Username.ToLower();
             user.PublicActivity = true;
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
-                throw new InvalidActionException(string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+                throw new InvalidActionException(FormatErrorMessage(result));
 
             var roleResult = await _userManager.AddToRoleAsync(user, "Member");
             if (!roleResult.Succeeded)
-                throw new InvalidActionException(string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+                throw new InvalidActionException(FormatErrorMessage(result));
         
             return user;
         }
@@ -227,5 +221,7 @@ namespace DatingApp.Services
             await _userManager.AddLoginAsync(user, loginInfo);
             return user;
         }
+
+        private static string FormatErrorMessage(IdentityResult result) => string.Join(Environment.NewLine, result.Errors.Select(e => e.Description));
     }
 }

@@ -28,6 +28,7 @@ export interface Member {
     country: string;
     relationTo?: string;
     publicActivity?: boolean;
+    dateOfBirth?: Date;
     photos: Photo[];
 }
 
