@@ -40,7 +40,10 @@ export class UserParams {
     pageSize = 5;
     orederBy: 'lastActive';
 
-    constructor(user: User){
-        this.gender = user.gender === 'female' ? 'male' : 'female';
+    constructor(user?: User){
+        if(user)
+            this.gender = user.gender === 'female' ? 'male' : 'female';
+        else
+            this.gender = 'male';
     }
 }

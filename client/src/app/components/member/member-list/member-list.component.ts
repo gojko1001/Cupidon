@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Pagination } from 'src/app/model/pagination';
-import { Member, User, UserParams } from 'src/app/model/user';
+import { Member, UserParams } from 'src/app/model/user';
 import { MembersService } from 'src/app/services/members.service';
 
 @Component({
@@ -10,7 +10,6 @@ import { MembersService } from 'src/app/services/members.service';
 })
 export class MemberListComponent implements OnInit {
   members: Member[];
-  user: User;
   pagination: Pagination;
   userParams: UserParams;
   genderList = [{value: 'male', display: 'Males'}, {value: 'female', display: 'Females'}]

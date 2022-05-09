@@ -26,7 +26,7 @@ export class MembersService {
   }
 
   getUserParams(){
-    return this.userParams;
+    return this.userParams ? this.userParams : new UserParams();
   }
 
   setUserParams(params: UserParams){

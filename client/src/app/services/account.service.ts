@@ -47,7 +47,7 @@ export class AccountService {
 
   setCurrentUser(user: User){
     user.roles = [];
-    const roles = getDecodedToken(user.token).role;
+    const roles = getDecodedToken(user.token)?.role;
     Array.isArray(roles) ? user.roles = roles : user.roles.push(roles);
 
     this.updateCurrentUser(user);
