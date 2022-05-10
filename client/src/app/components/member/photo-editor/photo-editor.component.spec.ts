@@ -3,6 +3,7 @@ import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SocialAuthService } from 'angularx-social-login';
 import { FileUploadModule } from 'ng2-file-upload';
 import { ToastrModule } from 'ngx-toastr';
 import { of } from 'rxjs';
@@ -17,7 +18,9 @@ describe('PhotoEditorComponent', () => {
   let component: PhotoEditorComponent;
   let fixture: ComponentFixture<PhotoEditorComponent>;
   let accService: AccountService;
-  let memberService: MembersService
+  let memberService: MembersService;
+
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
 
   let testPhoto1: Photo = {
     id: 1,
@@ -62,6 +65,9 @@ describe('PhotoEditorComponent', () => {
         ToastrModule.forRoot(),
         RouterTestingModule,
         FileUploadModule
+      ],
+      providers:[
+        {provide: SocialAuthService, useValue: socialAuthSpy}
       ]
     })
     .compileComponents();

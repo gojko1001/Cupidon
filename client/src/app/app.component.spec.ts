@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SocialAuthService } from 'angularx-social-login';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AppComponent } from './app.component';
@@ -12,11 +13,13 @@ import { User } from './model/user';
 import { AccountService } from './services/account.service';
 import { PresenceService } from './services/presence.service';
 
-xdescribe('AppComponent', () => {
+describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
   let component: AppComponent;
   let accService: AccountService;
   let presenceService: PresenceService;
+
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
 
   let testUser: User = {
     username: 'alice',
@@ -38,6 +41,9 @@ xdescribe('AppComponent', () => {
         ToastrModule.forRoot(),
         NgxSpinnerModule,
         FormsModule
+      ],
+      providers:[
+        {provide: SocialAuthService, useValue: socialAuthSpy}
       ],
       declarations: [ AppComponent, NavbarComponent ],
     }).compileComponents();
@@ -72,6 +78,8 @@ xdescribe('AppComponent', () => {
                                   .withArgs('RFTKN').and.returnValue(testRefreshToken)
     let spy = spyOn(accService, 'setCurrentUser');
     let hubSpy = spyOn(presenceService, 'createHubConnection');
+    testUser.token = testToken;
+    testUser.refreshToken = testRefreshToken;
 
     component.ngOnInit();
 

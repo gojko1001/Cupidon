@@ -2,6 +2,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
+import { SocialAuthService } from 'angularx-social-login';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ToastrModule } from 'ngx-toastr';
 import { of } from 'rxjs';
@@ -15,6 +16,8 @@ describe('MemberListComponent', () => {
   let component: MemberListComponent;
   let fixture: ComponentFixture<MemberListComponent>;
   let memberService: MembersService;
+
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
 
   let defaultUserParams: UserParams = {
     gender: 'male',
@@ -35,6 +38,9 @@ describe('MemberListComponent', () => {
         PaginationModule.forRoot(),
         FormsModule,
         ReactiveFormsModule
+      ],
+      providers:[
+        {provide: SocialAuthService, useValue: socialAuthSpy}
       ]
     })
     .compileComponents();

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SocialAuthService } from 'angularx-social-login';
 import { ToastrModule } from 'ngx-toastr';
 import { from } from 'rxjs';
 import { AccountService } from 'src/app/services/account.service';
@@ -16,6 +17,8 @@ describe('HomeComponent', () => {
   let fixture: ComponentFixture<HomeComponent>;
   let accService: AccountService;
 
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ HomeComponent ],
@@ -24,6 +27,9 @@ describe('HomeComponent', () => {
         ToastrModule.forRoot(),
         FormsModule,
         RouterTestingModule
+      ],
+      providers:[
+        {provide: SocialAuthService, useValue: socialAuthSpy}
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

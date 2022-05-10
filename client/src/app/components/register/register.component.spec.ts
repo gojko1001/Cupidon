@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { SocialAuthService } from 'angularx-social-login';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { ToastrModule } from 'ngx-toastr';
 import { from, throwError } from 'rxjs';
@@ -20,6 +21,8 @@ describe('RegisterComponent', () => {
   let component: RegisterComponent;
   let fixture: ComponentFixture<RegisterComponent>;
 
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ RegisterComponent, DateInputComponent, TextInputComponent ],
@@ -32,6 +35,7 @@ describe('RegisterComponent', () => {
       ],
       providers: [
         {provide: Router, useClass: RouterStub},
+        {provide: SocialAuthService, useValue: socialAuthSpy},
       ]
     })
     .compileComponents();

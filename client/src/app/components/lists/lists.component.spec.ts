@@ -1,5 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { of } from 'rxjs';
@@ -75,6 +76,8 @@ describe('ListsComponent', () => {
       imports: [ 
         HttpClientModule,
         PaginationModule.forRoot(),
+        // FormsModule,           //TODO: Throws errors in console for ngModel
+        // ReactiveFormsModule
       ]
     })
     .compileComponents();

@@ -16,6 +16,8 @@ export class HomeComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit(): void {
+    if(localStorage.getItem('user'))
+      this.router.navigateByUrl("/members");
     this.creds = { username: '', password: '' };
   }
 

@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SocialAuthService } from 'angularx-social-login';
 import { ToastrModule } from 'ngx-toastr';
 import { from } from 'rxjs';
 import { AccountService } from 'src/app/services/account.service';
@@ -15,6 +16,8 @@ describe('PasswordChangeComponent', () => {
   let fixture: ComponentFixture<PasswordChangeComponent>;
   let accService: AccountService;
 
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ PasswordChangeComponent, TextInputComponent ],
@@ -24,6 +27,9 @@ describe('PasswordChangeComponent', () => {
         RouterTestingModule,
         FormsModule,
         ReactiveFormsModule
+      ],
+      providers:[
+        {provide: SocialAuthService, useValue: socialAuthSpy}
       ]
     })
     .compileComponents();
