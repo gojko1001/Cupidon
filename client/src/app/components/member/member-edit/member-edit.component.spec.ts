@@ -3,6 +3,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SocialAuthService } from 'angularx-social-login';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ToastrModule } from 'ngx-toastr';
 import { from } from 'rxjs';
@@ -15,6 +17,8 @@ describe('MemberEditComponent', () => {
   let component: MemberEditComponent;
   let fixture: ComponentFixture<MemberEditComponent>;
   let memberService: MembersService;
+  
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
 
   let testMember: Member = { 
     id: 1,
@@ -41,7 +45,11 @@ describe('MemberEditComponent', () => {
         ToastrModule.forRoot(),
         RouterTestingModule,
         TabsModule,
-        FormsModule
+        FormsModule,
+        BsDatepickerModule.forRoot()
+      ],
+      providers:[
+        {provide: SocialAuthService, useValue: socialAuthSpy},
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

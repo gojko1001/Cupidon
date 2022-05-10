@@ -5,6 +5,7 @@ using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils.Pagination;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +45,6 @@ namespace DatingApp.Services
             return member;
         }
 
-        
         private async Task<MemberDto> GetRequestedUserInfo(string username, string requestingUsername)
         {
             var invertedRelation = await _unitOfWork.UserRelationRepository.GetUserRelation(username, requestingUsername);
@@ -106,10 +106,9 @@ namespace DatingApp.Services
             var user = await _unitOfWork.UserRepository.GetUserByUsername(username);
 
             _mapper.Map(memberUpdateDto, user);
-            _unitOfWork.UserRepository.Update(user);
-            if (await _unitOfWork.Complete())
-                return;
-            throw new ServerErrorException("Failed to update user info");
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                throw new InvalidActionException(FormatErrorMessage(result));
         }
 
         public async Task<IEnumerable<string>> EditRoles(string username, string[] roles)
@@ -144,26 +143,22 @@ namespace DatingApp.Services
 
             var changeResult = await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.Password);
             if (changeResult.Errors.Any())
-                throw new InvalidActionException(string.Join(Environment.NewLine, changeResult.Errors.Select(e => e.Description)));
+                throw new InvalidActionException(FormatErrorMessage(changeResult));
         }
 
         public async Task<AppUser> Register(RegisterDto registerDto)
         {
-            if (await _unitOfWork.UserRepository.UserExists(registerDto.Username))
-            {
-                throw new InvalidActionException("Username already exists!");
-            }
-
             var user = _mapper.Map<AppUser>(registerDto);
             user.UserName = registerDto.Username.ToLower();
+            user.PublicActivity = true;
 
             var result = await _userManager.CreateAsync(user, registerDto.Password);
             if (!result.Succeeded)
-                throw new InvalidActionException(string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+                throw new InvalidActionException(FormatErrorMessage(result));
 
             var roleResult = await _userManager.AddToRoleAsync(user, "Member");
             if (!roleResult.Succeeded)
-                throw new InvalidActionException(string.Join(Environment.NewLine, result.Errors.Select(e => e.Description)));
+                throw new InvalidActionException(FormatErrorMessage(result));
         
             return user;
         }
@@ -181,5 +176,52 @@ namespace DatingApp.Services
 
             return user;
         }
+
+        public async Task<AppUser> LoginGoogle(ExternalAuthDto externalAuthDto, GoogleJsonWebSignature.Payload payload)
+        {
+            var loginInfo = new UserLoginInfo(externalAuthDto.Provider, payload.Subject, externalAuthDto.Provider);
+            var user = await _userManager.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey);
+            if (user == null)
+            {
+                user = await _unitOfWork.UserRepository.GetUserByEmail(payload.Email);
+
+                if (user == null)
+                {
+                    user = await RegisterGoogle(payload, loginInfo);
+                }
+                else
+                {
+                    await _userManager.AddLoginAsync(user, loginInfo);
+                }
+
+                if (user == null)
+                    throw new InvalidActionException("Invalid External Authentication.");
+            } else
+            {
+                user = await _unitOfWork.UserRepository.GetUserByEmail(payload.Email);
+            }
+
+            if (user.Photos == null)
+                user.Photos = new List<Photo>();
+            return user;
+        }
+
+        private async Task<AppUser> RegisterGoogle(GoogleJsonWebSignature.Payload payload, UserLoginInfo loginInfo)
+        {
+            AppUser user = new()
+            {
+                UserName = payload.Email,
+                Email = payload.Email,
+                KnownAs = payload.GivenName,
+                PublicActivity = true
+            };
+            await _userManager.CreateAsync(user);
+
+            await _userManager.AddToRoleAsync(user, "Member");
+            await _userManager.AddLoginAsync(user, loginInfo);
+            return user;
+        }
+
+        private static string FormatErrorMessage(IdentityResult result) => string.Join(Environment.NewLine, result.Errors.Select(e => e.Description));
     }
 }

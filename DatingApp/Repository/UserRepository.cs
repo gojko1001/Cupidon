@@ -54,7 +54,7 @@ namespace DatingApp.Repository
         public async Task<AppUser> GetUserById(int id, bool isCurrentUser)
         {
             var query = _context.Users
-                       .Include(p => p.Photos)
+                       .Include(u => u.Photos)
                        .AsQueryable();
             if(isCurrentUser)
                 query = query.IgnoreQueryFilters();
@@ -71,15 +71,23 @@ namespace DatingApp.Repository
 
         public async Task<AppUser> GetUserByUsername(string username) 
             => await _context.Users
-            .Include(p => p.Photos)
+            .Include(u => u.Photos)
             .SingleOrDefaultAsync(u => u.UserName == username);
 
         public Task<AppUser> GetUserByUsernameIncludeRefreshTokens(string username)
         {
             return _context.Users
-                .Include(p => p.Photos)
+                .Include(u => u.Photos)
                 .Include(u => u.RefreshTokens)
                 .SingleOrDefaultAsync(u => u.UserName == username.ToLower());
+        }
+
+        public Task<AppUser> GetUserByEmail(string email)
+        {
+            return _context.Users
+                .Include(u => u.Photos)
+                .Include(u => u.RefreshTokens)
+                .SingleOrDefaultAsync(u => u.Email == email);
         }
 
         public void Update(AppUser user)

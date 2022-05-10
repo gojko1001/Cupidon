@@ -33,6 +33,39 @@
         <tabset class="member-tabset">
             <tab heading="About {{member.knownAs}}">
                 <form #editForm="ngForm" id="editForm" (ngSubmit)="updateMember()">
+                    <h4>Basic info</h4>
+                    <table>
+                        <tr>
+                            <td class="label">Username:</td>
+                            <td><input class="form-control" [(ngModel)]="member.username" name="username"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Alias:</td>
+                            <td><input class="form-control" [(ngModel)]="member.knownAs" name="knownAs"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Gender:</td>
+                            <td><div class="form-group text-center">
+                                <label class="radio-inline">
+                                    <input type="radio" value="male" [(ngModel)]="member.gender" name="gender"> Male
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" value="female" [(ngModel)]="member.gender" name="gender" class="ml-3"> Female
+                                </label>
+                            </div></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Birthday:</td>
+                            <td><input class="form-control" 
+                                type="text"
+                                name="dateOfBirth"
+                                [(ngModel)]="member.dateOfBirth"
+                                [maxDate]="maxDate"
+                                placeholder="DD MMM YYYY"
+                                bsDatepicker
+                                [bsConfig]="bsConfig"></td>
+                        </tr>
+                    </table>
                     <h4>Privacy</h4>
                     <div class="form-check">
                         <input class="form-check-input" [(ngModel)]="member.publicActivity" type="checkbox" name="publicActivity">

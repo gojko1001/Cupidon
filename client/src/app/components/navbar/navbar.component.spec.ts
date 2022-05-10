@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { SocialAuthService } from 'angularx-social-login';
 import { ToastrModule } from 'ngx-toastr';
-import { from, of } from 'rxjs';
+import { of } from 'rxjs';
 import { HasRoleDirective } from 'src/app/directives/has-role.directive';
 import { AccountService } from 'src/app/services/account.service';
 
@@ -21,6 +22,8 @@ describe('NavbarComponent', () => {
   let fixture: ComponentFixture<NavbarComponent>;
   let accService: AccountService;
 
+  let socialAuthSpy = jasmine.createSpyObj('SocialAuthService', ['signIn', 'signOut']);
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ NavbarComponent, HasRoleDirective ],
@@ -30,9 +33,10 @@ describe('NavbarComponent', () => {
         FormsModule,
         RouterTestingModule
       ],
-      // providers: [
-      //   {provide: Router, useClass: RouterStub},
-      // ]
+      providers: [
+        // {provide: Router, useClass: RouterStub},
+        {provide: SocialAuthService, useValue: socialAuthSpy},
+      ],
     })
     .compileComponents();
   });
@@ -70,11 +74,6 @@ describe('NavbarComponent', () => {
       expect(userMenu).toBeTruthy();
     })
     
-    it('should NOT render login form', () => {
-      let loginform: HTMLElement = fixture.debugElement.query(By.css('#loginform')) as any;  
-      expect(loginform).toBeFalsy();
-    })
-    
     it("should render user's username or knownas property", () => {
       let name: HTMLElement = fixture.debugElement.query(By.css('.dropdown-toggle')).nativeElement;
       expect(name.textContent.toLowerCase()).toContain(user.username.toLowerCase() || user.knownAs.toLowerCase());
@@ -93,37 +92,6 @@ describe('NavbarComponent', () => {
       let userMenu: HTMLElement = fixture.debugElement.query(By.css('#userMenu')) as any;
       expect(userMenu).toBeFalsy();
     })
-    
-    it('should render login form', () => {
-      let loginform: HTMLElement = fixture.debugElement.query(By.css('#loginform')) as any;  
-      expect(loginform).toBeTruthy();
-    })
-  })
-
-  
-  describe('login', () => {
-    it('should call the server to login', () => {
-      let creds = { username: 'user', password: 'pass'};
-      component.creds = creds;
-      let loginSpy = spyOn(accService, 'login').and.returnValue(from([]));
-  
-      component.login();
-  
-      expect(loginSpy).toHaveBeenCalledWith(creds);
-    });
-    
-    // TODO: Not working properly
-    xit('should redirect to members if login is successful', () => {
-      let router = fixture.debugElement.injector.get(Router);
-      let routeSpy = spyOn(router, 'navigateByUrl');
-      let loginSpy = spyOn(accService, 'login').and.returnValue(from([]));
-  
-      component.login();
-
-      loginSpy.calls.mostRecent().returnValue.subscribe(() => {
-        expect(routeSpy).toHaveBeenCalledWith('/members');
-      });
-    });
   })
 
 

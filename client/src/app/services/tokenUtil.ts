@@ -1,5 +1,9 @@
 export function getDecodedToken(token: string){
-    return JSON.parse(window.atob(token.split('.')[1]));
+    try{
+        return JSON.parse(window.atob(token.split('.')[1]));
+    } catch(e){
+        return null;
+    }
 }
 
 export function signOut(): void {

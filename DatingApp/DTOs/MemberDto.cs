@@ -19,6 +19,7 @@ namespace DatingApp.DTOs
         public string Country { get; set; }
         public string RelationTo { get; set; }
         public bool? PublicActivity { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public ICollection<PhotoDto> Photos { get; set; }
 
         public static Expression<Func<MemberDto, MemberDto>> BlockedUserSelector

@@ -35,6 +35,9 @@ export class ErrorInterceptor implements HttpInterceptor {
                     modalStateErrors.push(error.error.errors[key]);
                   }
                 }
+                modalStateErrors.forEach(err => {
+                  this.toastr.error(err, error.status.toString());
+                });
                 throw modalStateErrors.flat();
               } else if (typeof(error.error) === 'object'){
                 this.toastr.error(error.error.message, error.status.toString());
@@ -64,7 +67,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                     catchError(err => {
                       this.accountService.logout();
                       this.router.navigateByUrl('/');
-                      return throwError(err);
+                      return throwError(() => new Error(err.message));
                     }),
                     finalize(() => (this.refreshInProgress = false))
                   );
@@ -73,6 +76,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                 if(!error.error){       // Error is null if token is invalid
                   this.accountService.logout();
                   this.router.navigateByUrl('/');
+                  this.toastr.error("Invalid credentials");
                 }else{
                   this.toastr.error(error.error.message, error.status.toString());
                 }
@@ -91,7 +95,7 @@ export class ErrorInterceptor implements HttpInterceptor {
               break;
           }
         }
-        return throwError(error);
+        return throwError(() => new Error(error.message));
       })
     );
   }

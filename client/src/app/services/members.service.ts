@@ -13,7 +13,6 @@ import { getPaginatedResult, getPaginationHeaders } from './paginationUtil';
 })
 export class MembersService {
   userUrl = environment.apiUrl + 'users/';
-  members: Member[] = [];
   memberCache = new Map();
   user: User;
   userParams: UserParams;
@@ -27,7 +26,7 @@ export class MembersService {
   }
 
   getUserParams(){
-    return this.userParams;
+    return this.userParams ? this.userParams : new UserParams();
   }
 
   setUserParams(params: UserParams){
@@ -70,12 +69,7 @@ export class MembersService {
   }
 
   updateMember(member: Member){
-    return this.http.put(this.userUrl, member).pipe(
-      map(() => {
-        const idx = this.members.indexOf(member);
-        this.members[idx] = member;
-      })
-    );
+    return this.http.put(this.userUrl, member);
   }
 
   setMainPhoto(photoId: number){

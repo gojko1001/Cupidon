@@ -36,6 +36,19 @@ namespace DatingApp.Controllers
             return returnUser;
         }
 
+        [HttpPost("login/google")]
+        public async Task<ActionResult<UserDto>> LoginGoogle(ExternalAuthDto externalAuthDto)
+        {
+            var payload = await _tokenService.VerifyGoogleToken(externalAuthDto);
+            if (payload == null)
+                return BadRequest("Invalid External Authentication.");
+
+            var user = await _userService.LoginGoogle(externalAuthDto, payload);
+            var returnUser = await GetReturnUserDto(user);
+            returnUser.ProfilePhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain)?.Url;
+            return returnUser;
+        }
+
         [HttpPost("refresh-token")]
         public async Task<ActionResult<RefreshTokenDto>> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
         {

@@ -1,5 +1,6 @@
 ﻿using DatingApp.Data;
 using DatingApp.Entities;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -11,16 +12,16 @@ namespace DatingApp.Extensions
     {
         public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddIdentityCore<AppUser>(opts =>
+            services.AddIdentityCore<AppUser>(options =>
             {
-                opts.Password.RequiredLength = 8;
-                opts.Password.RequireNonAlphanumeric = true;
-                opts.Password.RequireDigit = true;
-                opts.Password.RequireLowercase = true;
-                opts.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
 
-                //opts.Lockout.MaxFailedAccessAttempts = 5;
-                //opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                //options.Lockout.MaxFailedAccessAttempts = 5;
+                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
             })
                 .AddRoles<AppRole>()
                 .AddRoleManager <RoleManager<AppRole>>()
@@ -28,10 +29,14 @@ namespace DatingApp.Extensions
                 .AddRoleValidator<RoleValidator<AppRole>>()
                 .AddEntityFrameworkStores<DataContext>();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt =>
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                //options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(options =>
                 {
-                    opt.TokenValidationParameters = new TokenValidationParameters
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"])),
@@ -40,7 +45,7 @@ namespace DatingApp.Extensions
                         ClockSkew = TimeSpan.Zero
                     };
 
-                    opt.Events = new JwtBearerEvents
+                    options.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
@@ -65,6 +70,14 @@ namespace DatingApp.Extensions
                         }
                     };
                 });
+                //.AddGoogle(options =>
+                //{
+                //    options.ClientId = config["Authentication:Google:ClientId"];
+                //    options.ClientSecret = config["Authentication:Google:ClientSecret"];
+                //    options.CallbackPath = "/signin-google";
+                //    options.SignInScheme = IdentityConstants.ExternalScheme;
+                //    options.AuthorizationEndpoint += "?prompt=consent";     // Prompts to choose account
+                //});
 
             services.AddAuthorization(options =>
             {
