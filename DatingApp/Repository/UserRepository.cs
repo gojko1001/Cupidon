@@ -27,28 +27,50 @@ namespace DatingApp.Repository
                 .Where(u => u.UserName == username)
                 .ProjectTo<MemberDto>(_mapper.ConfigurationProvider)
                 .AsQueryable();
-            if(isCurrentUser)
+            if (isCurrentUser)
                 query = query.IgnoreQueryFilters();
             return query;
         }
 
         public IQueryable<MemberDto> GetMembers(UserParams userParams)
         {
+            var query = _context.Users.AsQueryable();
+
+            if (!string.IsNullOrEmpty(userParams.searchString))
+                query = GetUsersBySearchString(userParams.searchString);
+
+            if (!string.IsNullOrEmpty(userParams.Gender))
+                query = query.Where(u => u.Gender == userParams.Gender);
+            
             var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1);
             var maxDob = DateTime.Today.AddYears(-userParams.MinAge);
 
-            var query = _context.Users.AsQueryable()
-                .Where(u => u.UserName != userParams.CurrentUsername)
-                .Where(u => u.Gender == userParams.Gender)
-                .Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob)
-                .ProjectTo<MemberDto>(_mapper.ConfigurationProvider);
+            query = query.Where(u => u.UserName != userParams.CurrentUsername)
+                         .Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob);
+
             query = userParams.OrderBy switch
             {
                 "created" => query.OrderByDescending(u => u.Created),
-                _ => query.OrderByDescending(u => u.LastActive)
+                "lastActive" => query.OrderByDescending(u => u.LastActive),
+                _ => query
             };
 
-            return query;
+            return query.ProjectTo<MemberDto>(_mapper.ConfigurationProvider);
+        }
+
+        private IQueryable<AppUser> GetUsersBySearchString(string searchString)
+        {
+            var query = _context.Users.AsQueryable();
+            var singleWordQuery = query.Take(0);
+
+            var searchStrings = searchString.ToLower().Split(' ').ToList();
+            foreach (var str in searchStrings)
+            {
+                query = query.Where(u => u.UserName.ToLower().Contains(str) || u.KnownAs.ToLower().Contains(str));
+
+                singleWordQuery = singleWordQuery.Union(_context.Users.Where(u => u.UserName.ToLower().Contains(str) || u.KnownAs.ToLower().Contains(str)));
+            }
+            return query.Union(singleWordQuery);
         }
 
         public async Task<AppUser> GetUserById(int id, bool isCurrentUser)
