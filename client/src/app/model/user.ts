@@ -33,17 +33,16 @@ export interface Member {
 }
 
 export class UserParams {
+    searchString: string;
     gender: string;
     minAge = 18;
     maxAge = 99;
+    orederBy: string;
     pageNumber = 1;
     pageSize = 5;
-    orederBy: 'lastActive';
 
     constructor(user?: User){
         if(user)
             this.gender = user.gender === 'female' ? 'male' : 'female';
-        else
-            this.gender = 'male';
     }
 }

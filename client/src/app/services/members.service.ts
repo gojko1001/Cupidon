@@ -48,8 +48,11 @@ export class MembersService {
     
     params = params.append('minAge', userParams.minAge.toString())
     params = params.append('maxAge', userParams.maxAge.toString())
-    params = params.append('gender', userParams.gender)
     params = params.append('orderBy', userParams.orederBy)
+    if(userParams.gender != 'all')
+      params = params.append('gender', userParams.gender)
+    if(userParams.searchString)
+      params = params.append('searchString', userParams.searchString)
 
     return getPaginatedResult<Member[]>(this.userUrl, params, this.http).pipe(
       map(response => {

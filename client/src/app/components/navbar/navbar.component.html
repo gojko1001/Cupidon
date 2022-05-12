@@ -16,6 +16,16 @@
                     <li class="nav-item" *appHasRole="['Admin', 'Moderator']">
                         <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active" >Admin</a>
                     </li>
+                    
+                    <form class="form-inline" (ngSubmit)="search()">
+                        <input type="text"
+                               name="searchString"
+                               placeholder="Search..."
+                               [(ngModel)]="searchString"
+                               class="form-control col ml-3"
+                               autocomplete="off">
+                        <span class="ml-1" style="color: white;" (click)="search()"><i class="fa fa-search fa-2x px-2"></i></span>
+                    </form>
                 </ng-container>
             </ul>
 

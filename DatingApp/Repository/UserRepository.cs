@@ -36,8 +36,8 @@ namespace DatingApp.Repository
         {
             var query = _context.Users.AsQueryable();
 
-            if (!string.IsNullOrEmpty(userParams.searchString))
-                query = GetUsersBySearchString(userParams.searchString);
+            if (!string.IsNullOrEmpty(userParams.SearchString))
+                query = GetUsersBySearchString(userParams.SearchString);
 
             if (!string.IsNullOrEmpty(userParams.Gender))
                 query = query.Where(u => u.Gender == userParams.Gender);

@@ -8,6 +8,7 @@ import { AccountService } from '../../services/account.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
+  searchString: string;
 
   constructor(public accountService: AccountService,
               private router: Router) { }
@@ -15,9 +16,16 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  search(){
+    if(!this.searchString) return;
+    this.router.navigate(['/members'], 
+          {queryParams: {"search": this.searchString}}
+    );
+  }
+
   logout(){
     this.accountService.logout();
-    this.router.navigateByUrl('/')
+    this.router.navigateByUrl('/');
   }
 
 }
