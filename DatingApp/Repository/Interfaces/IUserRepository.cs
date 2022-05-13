@@ -14,6 +14,5 @@ namespace DatingApp.Repository.Interfaces
         Task<AppUser> GetUserByPhotoId(int photoId);
         IQueryable<MemberDto> GetMembers(UserParams userParams);
         IQueryable<MemberDto> GetMember(string username, bool isCurrentUser);
-        public Task<bool> UserExists(string username);
     }
 }

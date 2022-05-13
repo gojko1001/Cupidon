@@ -116,7 +116,5 @@ namespace DatingApp.Repository
         {
             _context.Entry(user).State = EntityState.Modified;
         }
-
-        public async Task<bool> UserExists(string username) => await _context.Users.AnyAsync(x => x.UserName == username.ToLower());
     }
 }
