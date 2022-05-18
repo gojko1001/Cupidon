@@ -34,7 +34,7 @@ export interface Member {
 
 export class UserParams {
     searchString: string;
-    gender: string;
+    gender: string = 'all';
     minAge = 18;
     maxAge = 99;
     orederBy: string;

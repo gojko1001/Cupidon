@@ -42,7 +42,7 @@ export class MemberListComponent implements OnInit {
     this.userParams = this.memberService.resetUserParams();
     this.router.navigate([], {
       relativeTo: this.activatedRoute,
-      queryParams: {searchString: this.userParams.searchString},
+      queryParams: {search: this.userParams.searchString},
       replaceUrl: true,            // Changes query parameters without reloaing page, preserving memberCache and replaces history entry
       queryParamsHandling: 'merge'
     });

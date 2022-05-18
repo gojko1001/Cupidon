@@ -18,12 +18,22 @@
                     </li>
                     
                     <form class="form-inline" (ngSubmit)="search()">
+                        <ng-template #dynamicSearch let-member="item">
+                            <p class="mb-1"><img src="{{member.photoUrl || './assets/user.png'}}" class="mr-2">{{member.username}}</p>
+                        </ng-template>
                         <input type="text"
+                               #searchEl 
                                name="searchString"
                                placeholder="Search..."
-                               [(ngModel)]="searchString"
                                class="form-control col ml-3"
-                               autocomplete="off">
+                               autocomplete="off"
+                               [(ngModel)]="searchString"
+                               [typeahead]="quickResult$"
+                               [typeaheadAsync]="true"
+                               [typeaheadItemTemplate]="dynamicSearch"
+                               [typeaheadWaitMs]="500"
+                               typeaheadOptionField="username"
+                               (typeaheadOnSelect)="onQuickSearchSelect($event.item)">
                         <span class="ml-1" style="color: white;" (click)="search()"><i class="fa fa-search fa-2x px-2"></i></span>
                     </form>
                 </ng-container>
