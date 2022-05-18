@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { SocialUser } from 'angularx-social-login';
 import { AccountService } from 'src/app/services/account.service';
@@ -13,7 +14,10 @@ export class HomeComponent implements OnInit {
   creds: { username: string, password: string };
 
   constructor(private accountService: AccountService,
-              private router: Router) { }
+              private router: Router,
+              private titleService: Title) {
+                this.titleService.setTitle("Find your match | Cupidon");
+              }
 
   ngOnInit(): void {
     if(localStorage.getItem('user'))

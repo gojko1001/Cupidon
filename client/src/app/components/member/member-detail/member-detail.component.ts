@@ -8,6 +8,7 @@ import { AccountService } from 'src/app/services/account.service';
 import { UserRelationService } from 'src/app/services/user-relation.service';
 import { MessageService } from 'src/app/services/message.service';
 import { PresenceService } from 'src/app/services/presence.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-member-detail',
@@ -29,14 +30,16 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
               private userRelationService: UserRelationService,
               private route: ActivatedRoute,
               private router: Router,
+              private titleService: Title,
               public presence: PresenceService) {
-                this.accountService.currentUser$.pipe(take(1)).subscribe(data => this.user = data);
-                this.router.routeReuseStrategy.shouldReuseRoute = () => false;
-               }        
+    this.accountService.currentUser$.pipe(take(1)).subscribe(data => this.user = data);
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+  }        
 
   ngOnInit(): void {
     this.route.data.subscribe(data => {
       this.member = data.member;
+      this.titleService.setTitle(this.member.username + " | Cupidon")
     })
 
     this.route.queryParams.subscribe(params => {

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Pagination } from 'src/app/model/pagination';
 import { Member, UserParams } from 'src/app/model/user';
@@ -17,8 +18,10 @@ export class MemberListComponent implements OnInit {
 
   constructor(private memberService: MembersService,
               private router: Router,
-              private activatedRoute: ActivatedRoute) {
+              private activatedRoute: ActivatedRoute,
+              private titleService: Title) {
     this.userParams = this.memberService.getUserParams();
+    this.titleService.setTitle("Cupidon");
   }
 
   ngOnInit(): void {
