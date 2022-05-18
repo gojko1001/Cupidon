@@ -1,4 +1,4 @@
-.dropdown-toggle, .dropdown-item{
+.dropdown-toggle, .dropdown-item, .fa-search{
     cursor: pointer;
 }
 
@@ -6,8 +6,12 @@
     color: white;
 }
 
-img {
+.profile-avatar {
     max-height: 50px;
-    border: 2px solid #fff;
     display: inline;
+}
+
+.navbar-brand{
+    font-size: 30px;
+    font-family: 'Brush Script MT', cursive;
 }

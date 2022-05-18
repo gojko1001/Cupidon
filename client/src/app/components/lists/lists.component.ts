@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Pagination } from 'src/app/model/pagination';
 import { Member } from 'src/app/model/user';
 import { UserRelationService } from 'src/app/services/user-relation.service';
@@ -15,7 +16,10 @@ export class ListsComponent implements OnInit {
   pageSize = 5;
   pagination: Pagination;
 
-  constructor(private userRelationService: UserRelationService) { }
+  constructor(private userRelationService: UserRelationService,
+              private titleService: Title) {
+                this.titleService.setTitle("Lists | Cupidon")
+              }
 
   ngOnInit(): void {
     this.loadRelations();

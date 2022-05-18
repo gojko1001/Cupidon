@@ -5,6 +5,7 @@ import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocialAuthService } from 'angularx-social-login';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ToastrModule } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { HasRoleDirective } from 'src/app/directives/has-role.directive';
@@ -31,7 +32,8 @@ describe('NavbarComponent', () => {
         HttpClientModule, 
         ToastrModule.forRoot(),
         FormsModule,
-        RouterTestingModule
+        RouterTestingModule,
+        TypeaheadModule.forRoot()
       ],
       providers: [
         // {provide: Router, useClass: RouterStub},

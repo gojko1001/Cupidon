@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { BsDatepickerConfig } from 'ngx-bootstrap/datepicker';
 import { ToastrService } from 'ngx-toastr';
@@ -32,8 +33,12 @@ export class MemberEditComponent implements OnInit {
               private memberService: MembersService,
               private presence: PresenceService,
               private router: Router,
+              private titleService: Title,
               private toastr: ToastrService) { 
-                this.accountService.currentUser$.pipe(take(1)).subscribe(response => this.user = response);
+                this.accountService.currentUser$.pipe(take(1)).subscribe(response => {
+                  this.user = response;
+                  this.titleService.setTitle(this.user.username + " | Cupidon")
+                });
                 this.bsConfig = {
                   containerClass: 'theme-dark-blue',
                   dateInputFormat: 'DD MMMM YYYY'

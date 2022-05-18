@@ -1,5 +1,4 @@
-﻿using DatingApp.Extensions;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace DatingApp.Entities
 {
@@ -23,7 +22,5 @@ namespace DatingApp.Entities
         public ICollection<Message> MessagesRecieved { get; set; }
         public ICollection<AppUserRole> Roles { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; }
-
-        public int GetAge() => DateOfBirth.CalculateAge();
     }
 }

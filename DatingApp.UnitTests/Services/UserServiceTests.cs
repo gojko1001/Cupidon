@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DatingApp.UnitTests.Services
@@ -43,11 +42,11 @@ namespace DatingApp.UnitTests.Services
         public async Task UpdateUser_WhenCalled_SaveChangesToDB()
         {
             _unitOfWork.Setup(u => u.UserRepository.GetUserByUsername(_testUser.UserName)).ReturnsAsync(_testUser);
-            _unitOfWork.Setup(u => u.Complete()).ReturnsAsync(true);
+            _userManager.Setup(mgr => mgr.UpdateAsync(It.IsAny<AppUser>())).ReturnsAsync(IdentityResult.Success);
 
-            await _userService.UpdateUser(new MemberUpdateDto(), _testUser.UserName);
+            await _userService.UpdateUser(new MemberUpdateDto() { UserName = _testUser.UserName }, _testUser.UserName);
 
-            _unitOfWork.Verify(u => u.UserRepository.Update(It.IsAny<AppUser>()));
+            _userManager.Verify(u => u.UpdateAsync(It.IsAny<AppUser>()));
         }
 
 
@@ -114,15 +113,6 @@ namespace DatingApp.UnitTests.Services
 
 
         [Test]
-        public void Register_UserAlreadyExists_ThrowInvalidActionException()
-        {
-            _unitOfWork.Setup(u => u.UserRepository.UserExists(_testUser.UserName)).ReturnsAsync(true);
-
-            Assert.That(async () => await _userService.Register(
-                new RegisterDto() { Username = _testUser.UserName}), Throws.Exception.TypeOf<InvalidActionException>());
-        }
-
-        [Test]
         public async Task Register_WhenCalled_ReturnRegisteredUserAsync()
         {
             var registerDto = new RegisterDto
@@ -134,7 +124,6 @@ namespace DatingApp.UnitTests.Services
             {
                 UserName = registerDto.Username,
             };
-            _unitOfWork.Setup(u => u.UserRepository.UserExists(_testUser.UserName)).ReturnsAsync(false);
             _mapper.Setup(m => m.Map<AppUser>(registerDto)).Returns(user);
             _userManager.Setup(mgr => mgr.CreateAsync(user, registerDto.Password)).ReturnsAsync(IdentityResult.Success);
             _userManager.Setup(mgr => mgr.AddToRoleAsync(user, It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);

@@ -72,8 +72,6 @@ namespace DatingApp.Services
         public async Task<PagedList<MemberDto>> GetUsers(UserParams userParams)
         {
             var user = await _unitOfWork.UserRepository.GetUserByUsername(userParams.CurrentUsername);
-            if (string.IsNullOrEmpty(userParams.Gender))
-                userParams.Gender = (user.Gender == "male") ? "female" : "male";
 
             var users = _unitOfWork.UserRepository.GetMembers(userParams);
 

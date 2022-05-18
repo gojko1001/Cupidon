@@ -1,17 +1,21 @@
 <div class="text-center mt-3">
-    <h2>Your matches - {{pagination?.totalItems}} found</h2>
+    <h2 class="font-weight-normal">
+        <span *ngIf="userParams.searchString === undefined" >Your matches</span>
+        <span *ngIf="userParams.searchString !== undefined" >Search result for "<span class="font-weight-bold">{{userParams.searchString}}</span>"</span>
+         - {{pagination?.totalItems}} found
+    </h2>
 </div>
 
 <div class="container mt-3">
     <form #form class="form-inline mb-3" (ngSubmit)="loadMembers()" autocomplete="off">
         <div class="form-group">
             <label>Age from: </label>
-            <input type="number" class="form-control ml-1" style="width: 70px;" name="minAge"
+            <input type="number" class="form-control ml-1" style="width: 70px;" name="minAge" min="18"
                 [(ngModel)]="userParams.minAge">
         </div>
         <div class="form-group px-2">
             <label>Age to: </label>
-            <input type="number" class="form-control ml-1" style="width: 70px;" name="maxAge"
+            <input type="number" class="form-control ml-1" style="width: 70px;" name="maxAge" max="150"
                 [(ngModel)]="userParams.maxAge">
         </div>
         <div class="form-group px-2">
@@ -25,7 +29,7 @@
 
         <button class="btn btn-primary ml-1" type="submit">Apply Filters</button>
         <button class="btn btn-info ml-1" type="submit" id="resetFiltersBtn" (click)="resetFilters()">Reset Filters</button>
-        <div class="col">
+        <div class="col" *ngIf="userParams.searchString == undefined">
             <div class="btn-group float-right">
                 <button
                 type="button"

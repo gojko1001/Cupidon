@@ -26,6 +26,7 @@ describe('MemberListComponent', () => {
     pageNumber: 1,
     pageSize: 5,
     orederBy: 'lastActive',
+    searchString: ''
   }
 
   beforeEach(async () => {
@@ -81,6 +82,7 @@ describe('MemberListComponent', () => {
       pageNumber: 3,
       pageSize: 3,
       orederBy: 'lastActive',
+      searchString: ''
     };
     let resetFiltersBtn = fixture.debugElement.query(By.css('#resetFiltersBtn'))
     spyOn(memberService, 'getMembers').and.returnValue(of({result: [{id: 1}]}))

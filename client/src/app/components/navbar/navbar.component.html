@@ -1,7 +1,10 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <div class="container">
         <div class="container-fluid">
-            <a class="navbar-brand" [routerLink]="['/']">Dating App</a>
+            <a class="navbar-brand" [routerLink]="['/']">
+                <img src="../../../assets/cupidon-logo.png" alt="" style="height: 50px;">
+                Cupidon
+            </a>
             <ul class="navbar-nav mr-auto" id='userLinks'>
                 <ng-container *ngIf="accountService.currentUser$ | async">    
                     <li class="nav-item">
@@ -16,11 +19,31 @@
                     <li class="nav-item" *appHasRole="['Admin', 'Moderator']">
                         <a class="nav-link" [routerLink]="['/admin']" routerLinkActive="active" >Admin</a>
                     </li>
+                    
+                    <form class="form-inline" (ngSubmit)="search()">
+                        <ng-template #dynamicSearch let-member="item">
+                            <p class="mb-1"><img src="{{member.photoUrl || './assets/user.png'}}" class="profile-avatar mr-2">{{member.username}}</p>
+                        </ng-template>
+                        <input type="text"
+                               #searchEl 
+                               name="searchString"
+                               placeholder="Search..."
+                               class="form-control col ml-3"
+                               autocomplete="off"
+                               [(ngModel)]="searchString"
+                               [typeahead]="quickResult$"
+                               [typeaheadAsync]="true"
+                               [typeaheadItemTemplate]="dynamicSearch"
+                               [typeaheadWaitMs]="500"
+                               typeaheadOptionField="username"
+                               (typeaheadOnSelect)="onQuickSearchSelect($event.item)">
+                        <span class="ml-1" style="color: white;" (click)="search()"><i class="fa fa-search fa-2x px-2"></i></span>
+                    </form>
                 </ng-container>
             </ul>
 
             <div id="userMenu" class="dropdown" *ngIf="(accountService.currentUser$ | async) as user" dropdown>
-                <img src="{{user.profilePhotoUrl || './assets/user.png'}}">
+                <img src="{{user.profilePhotoUrl || './assets/user.png'}}" class="profile-avatar">
                 <a class="dropdown-toggle text-login ml-3" dropdownToggle>Welcome {{user.knownAs || user.username | titlecase}}</a>
                 <div class="dropdown-menu mt-3" *dropdownMenu>
                     <a href="" class="dropdown-item" [routerLink]="['/members', user.username]">Profile</a>

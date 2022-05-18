@@ -62,15 +62,7 @@ namespace DatingApp.Repository
                     throw new InvalidActionException("Bad predicate");
             }
 
-            var relatedUsers = users.Select(user => new RelationDto
-            {
-                Id = user.Id,
-                Username = user.UserName,
-                KnownAs = user.KnownAs,
-                Age = user.GetAge(),
-                PhotoUrl = user.Photos.FirstOrDefault(p => p.IsMain).Url,
-                City = user.City
-            });
+            var relatedUsers = users.Select(RelationDto.UserToRelationSelector);
 
             return await PagedList<RelationDto>.CreateAsync(relatedUsers, relationParams.PageNumber, relationParams.PageSize);
         }

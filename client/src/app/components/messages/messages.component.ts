@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Title } from '@angular/platform-browser';
 import { Message } from 'src/app/model/message';
 import { Pagination } from 'src/app/model/pagination';
 import { ConfirmService } from 'src/app/services/confirm.service';
@@ -17,7 +18,11 @@ export class MessagesComponent implements OnInit {
   pageSize = 5;
   loading: boolean
 
-  constructor(private messageService: MessageService, private confirmService: ConfirmService) { }
+  constructor(private messageService: MessageService,
+              private confirmService: ConfirmService,
+              private titleService: Title) {
+                this.titleService.setTitle("Messages | Cupidon")
+              }
 
   ngOnInit(): void {
     this.loadMessages();
