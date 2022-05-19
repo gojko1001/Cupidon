@@ -5,6 +5,7 @@ using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services;
 using DatingApp.Services.interfaces;
+using DatingApp.Utils.CloudinaryUtil;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Moq;
@@ -20,6 +21,7 @@ namespace DatingApp.UnitTests.Services
         private Mock<IUnitOfWork> _unitOfWork;
         private Mock<IMapper> _mapper;
         private Mock<IUserRelationService> _userRelationService;
+        private Mock<ICloudinaryService> _cloudinaryService;
         private Mock<UserManager<AppUser>> _userManager;
         private Mock<SignInManager<AppUser>> _signInManager;
         private UserService _userService;
@@ -32,10 +34,11 @@ namespace DatingApp.UnitTests.Services
             _unitOfWork = new Mock<IUnitOfWork>();
             _mapper = new Mock<IMapper>();
             _userRelationService = new Mock<IUserRelationService>();
+            _cloudinaryService = new Mock<ICloudinaryService>();
             _userManager = MockUserManager<AppUser>();
             _signInManager = MockSignInManager<AppUser>();
 
-            _userService = new UserService(_unitOfWork.Object, _mapper.Object, _userRelationService.Object, _userManager.Object, _signInManager.Object);
+            _userService = new UserService(_unitOfWork.Object, _mapper.Object, _userRelationService.Object, _cloudinaryService.Object, _userManager.Object, _signInManager.Object);
         }
             
         [Test]

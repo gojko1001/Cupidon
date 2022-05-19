@@ -63,12 +63,12 @@ namespace DatingApp.Data
             builder.Entity<Message>()
                 .HasOne(u => u.Recipient)
                 .WithMany(m => m.MessagesRecieved)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Message>()
                 .HasOne(u => u.Sender)
                 .WithMany(m => m.MessagesSent)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Photo>().HasQueryFilter(p => p.IsApproved);
 
@@ -82,10 +82,10 @@ namespace DatingApp.Data
     {
         private const string IsUtcAnnotation = "IsUtc";
         private static readonly ValueConverter<DateTime, DateTime> UtcConverter =
-          new ValueConverter<DateTime, DateTime>(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+          new(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
         private static readonly ValueConverter<DateTime?, DateTime?> UtcNullableConverter =
-          new ValueConverter<DateTime?, DateTime?>(v => v, v => v == null ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc));
+          new(v => v, v => v == null ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc));
 
         public static PropertyBuilder<TProperty> IsUtc<TProperty>(this PropertyBuilder<TProperty> builder, bool isUtc = true) =>
           builder.HasAnnotation(IsUtcAnnotation, isUtc);

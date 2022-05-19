@@ -12,6 +12,7 @@ namespace DatingApp.Services.interfaces
         Task<IEnumerable<object>> GetUsersWithRole();
         Task UpdateUser(MemberUpdateDto memberUpdateDto, string username);
         Task ChangePassword(PasswordChangeDto passwordChangeDto, int userId);
+        Task DeactivateProfile(int id);
         Task<IEnumerable<string>> EditRoles(string username, string[] roles);
         Task<AppUser> Register(RegisterDto registerDto);
         Task<AppUser> Login(LoginDto loginDto);

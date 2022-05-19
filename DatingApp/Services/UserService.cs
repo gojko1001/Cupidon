@@ -4,6 +4,7 @@ using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
+using DatingApp.Utils.CloudinaryUtil;
 using DatingApp.Utils.Pagination;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
@@ -16,15 +17,17 @@ namespace DatingApp.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IUserRelationService _userRelationService;
+        private readonly ICloudinaryService _cloudinaryService;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IUserRelationService userRelationService,
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, IUserRelationService userRelationService, ICloudinaryService cloudinaryService,
             UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userRelationService = userRelationService;
+            _cloudinaryService = cloudinaryService;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -142,6 +145,20 @@ namespace DatingApp.Services
             var changeResult = await _userManager.ChangePasswordAsync(user, passwordChangeDto.OldPassword, passwordChangeDto.Password);
             if (changeResult.Errors.Any())
                 throw new InvalidActionException(FormatErrorMessage(changeResult));
+        }
+        
+        public async Task DeactivateProfile(int id)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserById(id, true);
+
+            _unitOfWork.UserRepository.Remove(user);
+            if (await _unitOfWork.Complete())
+            {
+                await _cloudinaryService.DeletePhotos(user.Photos.Select(p => p.PublicId));
+                return;
+            }
+
+            throw new ServerErrorException("Failed to delete user: " + user.UserName);
         }
 
         public async Task<AppUser> Register(RegisterDto registerDto)

@@ -6,13 +6,14 @@ namespace DatingApp.Repository.Interfaces
 {
     public interface IUserRepository
     {
-        void Update(AppUser user);
+        IQueryable<MemberDto> GetMember(string username, bool isCurrentUser);
+        IQueryable<MemberDto> GetMembers(UserParams userParams);
         Task<AppUser> GetUserById(int id, bool isCurrentUser = false);
         Task<AppUser> GetUserByUsername(string username);
         Task<AppUser> GetUserByUsernameIncludeRefreshTokens(string username);
         Task<AppUser> GetUserByEmail(string email);
         Task<AppUser> GetUserByPhotoId(int photoId);
-        IQueryable<MemberDto> GetMembers(UserParams userParams);
-        IQueryable<MemberDto> GetMember(string username, bool isCurrentUser);
+        void Update(AppUser user);
+        void Remove(AppUser user);
     }
 }

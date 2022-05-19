@@ -3,16 +3,16 @@ using DatingApp.Entities;
 using DatingApp.Errors;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
-using DatingApp.Utils;
+using DatingApp.Utils.CloudinaryUtil;
 
 namespace DatingApp.Services
 {
     public class PhotoService : IPhotoService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly CloudinaryService _cloudinaryService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public PhotoService(IUnitOfWork unitOfWork, CloudinaryService cloudinaryService)
+        public PhotoService(IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
         {
             _unitOfWork = unitOfWork;
             _cloudinaryService = cloudinaryService;
@@ -22,7 +22,7 @@ namespace DatingApp.Services
         {
             var user = await _unitOfWork.UserRepository.GetUserById(userId, true);
 
-            var result = await _cloudinaryService.AddPhotoAsync(file);
+            var result = await _cloudinaryService.AddPhoto(file);
             if (result.Error != null)
                 throw new InvalidActionException(result.Error.Message);
 
@@ -75,7 +75,7 @@ namespace DatingApp.Services
 
             if (photo.PublicId != null)
             {
-                var result = await _cloudinaryService.DeletePhotoAsync(photo.PublicId);
+                var result = await _cloudinaryService.DeletePhoto(photo.PublicId);
                 if (result.Error != null)
                     throw new InvalidActionException(result.Error.Message);
             }
@@ -116,7 +116,7 @@ namespace DatingApp.Services
                 throw new NotFoundException("Photo not found");
             if (photo.PublicId != null)
             {
-                var result = await _cloudinaryService.DeletePhotoAsync(photo.PublicId);
+                var result = await _cloudinaryService.DeletePhoto(photo.PublicId);
                 if (result.Error == null)
                     _unitOfWork.PhotoRepository.RemovePhoto(photo);
             }

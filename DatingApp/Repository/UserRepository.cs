@@ -84,13 +84,6 @@ namespace DatingApp.Repository
                        .SingleOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<AppUser> GetUserByPhotoId(int photoId) 
-            => await _context.Users
-                .Include(u => u.Photos)
-                .Where(u => u.Photos.Any(p => p.Id == photoId))
-                .IgnoreQueryFilters()
-                .SingleOrDefaultAsync();
-
         public async Task<AppUser> GetUserByUsername(string username) 
             => await _context.Users
             .Include(u => u.Photos)
@@ -111,10 +104,22 @@ namespace DatingApp.Repository
                 .Include(u => u.RefreshTokens)
                 .SingleOrDefaultAsync(u => u.Email == email);
         }
+        
+        public async Task<AppUser> GetUserByPhotoId(int photoId) 
+            => await _context.Users
+                .Include(u => u.Photos)
+                .Where(u => u.Photos.Any(p => p.Id == photoId))
+                .IgnoreQueryFilters()
+                .SingleOrDefaultAsync();
 
         public void Update(AppUser user)
         {
             _context.Entry(user).State = EntityState.Modified;
+        }
+
+        public void Remove(AppUser user)
+        {
+            _context.Users.Remove(user);
         }
     }
 }

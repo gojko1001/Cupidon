@@ -5,6 +5,7 @@ using DatingApp.Services;
 using DatingApp.Services.interfaces;
 using DatingApp.SignalR;
 using DatingApp.Utils;
+using DatingApp.Utils.CloudinaryUtil;
 using Microsoft.EntityFrameworkCore;
 
 namespace DatingApp.Extensions
@@ -15,7 +16,7 @@ namespace DatingApp.Extensions
         {
             services.AddSingleton<PresenceTracker>();
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
-            services.AddScoped<CloudinaryService>();
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlite(config.GetConnectionString("DefaultConnection"));

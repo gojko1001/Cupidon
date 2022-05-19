@@ -2,9 +2,9 @@
 using CloudinaryDotNet.Actions;
 using Microsoft.Extensions.Options;
 
-namespace DatingApp.Utils
+namespace DatingApp.Utils.CloudinaryUtil
 {
-    public class CloudinaryService
+    public class CloudinaryService : ICloudinaryService
     {
         private readonly Cloudinary _cloudinary;
 
@@ -20,7 +20,7 @@ namespace DatingApp.Utils
             _cloudinary = new Cloudinary(acc);
         }
 
-        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+        public async Task<ImageUploadResult> AddPhoto(IFormFile file)
         {
             var uploadResult = new ImageUploadResult();
             if (file.Length > 0)
@@ -37,11 +37,17 @@ namespace DatingApp.Utils
             return uploadResult;
         }
 
-        public async Task<DeletionResult> DeletePhotoAsync(string publicId)
+        public async Task<DeletionResult> DeletePhoto(string publicId)
         {
             var deleteParams = new DeletionParams(publicId);
 
             return await _cloudinary.DestroyAsync(deleteParams);
+        }
+
+        public async Task DeletePhotos(IEnumerable<string> photoIds)
+        {
+            foreach (var id in photoIds)
+                await DeletePhoto(id);
         }
     }
 }
