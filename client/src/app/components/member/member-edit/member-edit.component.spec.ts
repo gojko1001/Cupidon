@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocialAuthService } from 'angularx-social-login';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ToastrModule } from 'ngx-toastr';
 import { from } from 'rxjs';
@@ -46,6 +47,7 @@ describe('MemberEditComponent', () => {
         RouterTestingModule,
         TabsModule,
         FormsModule,
+        ModalModule.forRoot(),
         BsDatepickerModule.forRoot()
       ],
       providers:[

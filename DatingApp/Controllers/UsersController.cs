@@ -70,12 +70,5 @@ namespace DatingApp.Controllers
             await _photoService.RemovePhoto(photoId, User.GetId());
             return Ok();
         }
-
-        [HttpDelete]
-        public async Task<ActionResult> DeactivateProfile()
-        {
-            await _userService.DeactivateProfile(User.GetId()); 
-            return Ok();
-        }
     }
 }

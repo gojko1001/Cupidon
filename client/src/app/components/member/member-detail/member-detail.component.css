@@ -1,5 +1,6 @@
 .img-thumbnail {
     margin: 25px;
+    margin-bottom: 5px;
     width: 85%;
     height: 85%;
 }

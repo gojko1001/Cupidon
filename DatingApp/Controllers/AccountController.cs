@@ -64,6 +64,15 @@ namespace DatingApp.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpDelete]
+        public async Task<ActionResult> DeactivateProfile()
+        {
+            await _userService.DeactivateProfile(User.GetId());
+            return Ok();
+        }
+
+
         private async Task<UserDto> GetReturnUserDto(AppUser user)
             => new UserDto
             {

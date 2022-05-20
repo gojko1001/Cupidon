@@ -111,6 +111,10 @@ export class AccountService {
     return this.http.put(this.accountUrl + "update-password", passwordChange);
   }
 
+  deactivateProfile(){
+    return this.http.delete(this.accountUrl);
+  }
+
   refreshToken(token: string){
     return this.http.post(this.accountUrl + "refresh-token", {refreshToken: token});
   }

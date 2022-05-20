@@ -4,7 +4,8 @@
             <img src="{{member.photoUrl || './assets/user.png'}}" alt="{{member.knownAs}}" class="card-img-top img-thumbnail">
             <div class="card-body">
                 <div>
-                    <strong style="font-size: 25px;">{{member.username | titlecase}}</strong>
+                    <strong style="font-size: 1.2rem;">{{member.knownAs | titlecase}}</strong>
+                    <p class="text-secondary">@{{member.username}}</p>
                 </div>
                 <div *ngIf="member.username != user.username && member.relationTo != 'BLOCKED'">
                     <div class="mb-2 text-success" *ngIf="(presence.onlineUsers$ | async).includes(member.username)">
@@ -14,9 +15,9 @@
                         <i class="fa fa-clock-o"></i> {{member.lastActive | timeago}}
                     </div>
                 </div>
-                <div *ngIf="member.relationTo != 'BLOCKED'">
+                <div *ngIf="member.relationTo != 'BLOCKED' && (member.city || member.country)">
                     <strong>Location: </strong>
-                    <p>{{member.city}}, {{member.country}}</p>
+                    <p>{{member.city}}<span *ngIf="member.city && member.country">, </span>{{member.country}}</p>
                 </div>
                 <div>
                     <strong>Age: </strong>
@@ -45,19 +46,23 @@
     </div>
     <div class="col-8" >
         <tabset class="member-tabset" #memberTabs [hidden]="member.relationTo === 'BLOCKED'">
-            <tab heading="About {{member.knownAs}}" (selectTab)="onTabActivated($event)">
+            <tab heading="About" (selectTab)="onTabActivated($event)">
                 <h4>Description</h4>
                 <p>{{member.introduction}}</p>
+                <p *ngIf="!member.introduction" class="text-secondary">Not specified yet.</p>
                 <h4>Looking for</h4>
                 <p>{{member.lookingFor}}</p>
+                <p *ngIf="!member.lookingFor" class="text-secondary">Not specified yet.</p>
             </tab>
             <tab heading="Intrests" (selectTab)="onTabActivated($event)">
             <h4>Intrests</h4>
             <p>{{member.interests}}</p>
+            <p *ngIf="!member.interests" class="text-secondary">Not specified yet.</p>
         </tab>
         <tab heading="Photos" (selectTab)="onTabActivated($event)">
+            <p *ngIf="galleryImages && galleryImages.length < 1" class="text-secondary">No photos yet.</p>
             <ngx-gallery [options]="galleryOptions" [images]="galleryImages" class="ngx-gallery"
-            style="display: inline-block; margin-bottom: 20px;"></ngx-gallery> 
+            style="display: inline-block; margin-bottom: 20px;"></ngx-gallery>
         </tab>
         <tab heading="Messages" (selectTab)="onTabActivated($event)">
             <app-member-messages *ngIf="member.username != user.username"></app-member-messages>

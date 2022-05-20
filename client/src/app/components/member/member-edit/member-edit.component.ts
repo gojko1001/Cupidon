@@ -7,6 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { take } from 'rxjs/operators';
 import { Member, User } from 'src/app/model/user';
 import { AccountService } from 'src/app/services/account.service';
+import { ConfirmService } from 'src/app/services/confirm.service';
 import { MembersService } from 'src/app/services/members.service';
 import { PresenceService } from 'src/app/services/presence.service';
 
@@ -17,8 +18,9 @@ import { PresenceService } from 'src/app/services/presence.service';
 })
 export class MemberEditComponent implements OnInit {
   @ViewChild('editForm') editForm: NgForm;
+  @ViewChild('generalForm') generalForm: NgForm;
   @HostListener('window:beforeunload', ['$event']) unloadNotification($event: any){
-    if(this.editForm.dirty){
+    if(this.editForm.dirty || this.generalForm.dirty){
       $event.returnValue = true;
     }
   }
@@ -32,6 +34,7 @@ export class MemberEditComponent implements OnInit {
   constructor(private accountService: AccountService,
               private memberService: MembersService,
               private presence: PresenceService,
+              private confirmService: ConfirmService,
               private router: Router,
               private titleService: Title,
               private toastr: ToastrService) { 
@@ -52,7 +55,7 @@ export class MemberEditComponent implements OnInit {
   }
 
   loadMember(){
-    this.memberService.getMember(this.user.username).subscribe((response: any) => {
+    this.memberService.getMember(this.user.username).subscribe((response: Member) => {
       this.member = response
       this.member.dateOfBirth = new Date(response.dateOfBirth)
     })
@@ -61,8 +64,10 @@ export class MemberEditComponent implements OnInit {
   updateMember(){
     this.memberService.updateMember(this.member).subscribe(() => {
       this.editForm.reset(this.member);
+      this.generalForm.reset(this.member);
       this.toastr.success("Profile updated successfully");
 
+      this.user.knownAs = this.member.knownAs;
       if(this.member.username !== this.user.username){
         this.requireRelogin();
         return;
@@ -76,7 +81,7 @@ export class MemberEditComponent implements OnInit {
 
   requireRelogin(){
     this.accountService.logout();
-    this.router.navigateByUrl('');
+    this.router.navigateByUrl('/');
     this.toastr.info("Please login again");
   }
 
@@ -88,6 +93,18 @@ export class MemberEditComponent implements OnInit {
       this.presence.createHubConnection();
     else
       this.presence.stopHubConnection();
+  }
+
+  deactivateProfile(){
+    this.confirmService.confirm(
+      "Delete profile",
+      "Your profile will be pernamently deleted. This cannot be undone. Are you sure you want to proceed?").subscribe((result: boolean) => {
+        if(result)
+          this.accountService.deactivateProfile().subscribe(() => {
+            this.accountService.logout();
+            this.router.navigateByUrl('/');
+          });
+    });
   }
 
 }
