@@ -2,6 +2,7 @@
 using DatingApp.DTOs;
 using DatingApp.Entities;
 using DatingApp.Errors;
+using DatingApp.Extensions;
 using DatingApp.Repository.Interfaces;
 using DatingApp.Services.interfaces;
 using DatingApp.Utils.CloudinaryUtil;
@@ -185,7 +186,9 @@ namespace DatingApp.Services
             if (user == null)
                 throw new UnauthorizedException("Invalid username or password!");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, true);
+            if (result.IsLockedOut)
+                throw new UnauthorizedException("Maximum failed login attempts reached! Try again in " + user.LockoutEnd.Value.DateTime.GetTimeDifferenceInMinutes() + " min");
             if (!result.Succeeded)
                 throw new UnauthorizedException("Invalid username or password!");
 

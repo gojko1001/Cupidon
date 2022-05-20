@@ -20,8 +20,9 @@ namespace DatingApp.Extensions
                 options.Password.RequireLowercase = true;
                 options.Password.RequireUppercase = true;
 
-                //options.Lockout.MaxFailedAccessAttempts = 5;
-                //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.AllowedForNewUsers = true;
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
             })
                 .AddRoles<AppRole>()
                 .AddRoleManager <RoleManager<AppRole>>()

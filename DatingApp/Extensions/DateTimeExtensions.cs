@@ -9,5 +9,10 @@
             if (dob.Date > today.AddYears(-age)) age--;
             return age;
         }
+
+        public static double GetTimeDifferenceInMinutes(this DateTime dateTime)
+        {
+            return Math.Ceiling(dateTime.Subtract(DateTime.UtcNow).TotalMinutes);
+        }
     }
 }
