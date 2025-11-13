@@ -62,8 +62,8 @@ public static class IdentityServiceExtension
                     {
                         if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                         {
-                            context.Response.Headers.Add("Token-Expired", "true");
-                            context.Response.Headers.Add("Access-Control-Expose-Headers", "Token-Expired");
+                            context.Response.Headers.Append("Token-Expired", "true");
+                            context.Response.Headers.Append("Access-Control-Expose-Headers", "Token-Expired");
                         }
                         return Task.CompletedTask;
                     }

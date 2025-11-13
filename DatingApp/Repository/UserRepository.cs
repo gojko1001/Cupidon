@@ -20,7 +20,6 @@ public class UserRepository : IUserRepository
         _mapper = mapper;
     }
 
-
     public IQueryable<MemberDto> GetMember(string username, bool isCurrentUser)
     {
         var query = _context.Users

@@ -90,7 +90,6 @@ public class MessageHub : Hub
         throw new HubException("Failed to remove from group");
     }
 
-
     private static string GetGroupName(string caller, string other)
     {
         var stringCompare = string.Compare(caller, other) < 0;
