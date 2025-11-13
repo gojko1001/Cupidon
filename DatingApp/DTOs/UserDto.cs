@@ -1,13 +1,18 @@
-﻿namespace DatingApp.DTOs
+﻿namespace DatingApp.DTOs;
+
+public class UserDto
 {
-    public class UserDto
-    {
-        public string Username { get; set; }
-        public string Token { get; set; }
-        public string RefreshToken { get; set; }
-        public string ProfilePhotoUrl { get; set; }
-        public string KnownAs { get; set; }
-        public string Gender { get; set; }
-        public bool PublicActivity { get; set; }
-    }
+    public string Username { get; set; }
+
+    public string Token { get; set; }
+
+    public string RefreshToken { get; set; }
+
+    public string ProfilePhotoUrl { get; set; }
+
+    public string KnownAs { get; set; }
+
+    public string Gender { get; set; }
+
+    public bool PublicActivity { get; set; }
 }

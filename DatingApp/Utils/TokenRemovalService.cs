@@ -1,49 +1,48 @@
 ﻿using DatingApp.Repository.Interfaces;
 
-namespace DatingApp.Utils
+namespace DatingApp.Utils;
+
+public class TokenRemovalService : IHostedService
 {
-    public class TokenRemovalService : IHostedService
+    private readonly IServiceScopeFactory _scopeFactory;
+    private Timer timer;
+
+    public TokenRemovalService(IServiceScopeFactory scopeFactory)
     {
-        private readonly IServiceScopeFactory _scopeFactory;
-        private Timer timer;
+        _scopeFactory = scopeFactory;
+    }
 
-        public TokenRemovalService(IServiceScopeFactory scopeFactory)
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        var nextRunTime = DateTime.Today.AddDays(1);
+        var firstInterval = nextRunTime.Subtract(DateTime.UtcNow);
+
+        Action action = () =>
         {
-            _scopeFactory = scopeFactory;
-        }
+            var t1 = Task.Delay(firstInterval);
+            t1.Wait();
+            RemoveExpiredTokens(null);
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            var nextRunTime = DateTime.Today.AddDays(1);
-            var firstInterval = nextRunTime.Subtract(DateTime.UtcNow);
+            timer = new Timer(RemoveExpiredTokens, null, TimeSpan.Zero, TimeSpan.FromHours(12));
+        };
 
-            Action action = () =>
-            {
-                var t1 = Task.Delay(firstInterval);
-                t1.Wait();
-                RemoveExpiredTokens(null);
+        Task.Run(action);
+        return Task.CompletedTask;
+    }
 
-                timer = new Timer(RemoveExpiredTokens, null, TimeSpan.Zero, TimeSpan.FromHours(12));
-            };
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        timer?.Change(Timeout.Infinite, 0);
 
-            Task.Run(action);
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
+    }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            timer?.Change(Timeout.Infinite, 0);
+    private void RemoveExpiredTokens(object state)
+    {
+        using var scope = _scopeFactory.CreateScope();
 
-            return Task.CompletedTask;
-        }
-
-        private void RemoveExpiredTokens(object state)
-        {
-            using var scope = _scopeFactory.CreateScope();
-
-            var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-            uow.RefreshTokenRepository.RemoveExpiredTokensAsync();
-            uow.Complete();
-        } 
+        var uow = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+        uow.RefreshTokenRepository.RemoveExpiredTokensAsync();
+        uow.Complete();
     }
 }

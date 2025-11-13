@@ -1,10 +1,10 @@
 ﻿using DatingApp.Entities;
 
-namespace DatingApp.Repository.Interfaces
+namespace DatingApp.Repository.Interfaces;
+
+public interface IRefreshTokenRepository
 {
-    public interface IRefreshTokenRepository
-    {
-        Task<IEnumerable<RefreshToken>> GetExpiredTokens();
-        Task RemoveExpiredTokensAsync();
-    }
+    Task<IEnumerable<RefreshToken>> GetExpiredTokens();
+
+    Task RemoveExpiredTokensAsync();
 }

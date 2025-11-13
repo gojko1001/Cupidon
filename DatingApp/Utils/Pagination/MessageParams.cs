@@ -1,9 +1,10 @@
-﻿namespace DatingApp.Utils.Pagination
+﻿namespace DatingApp.Utils.Pagination;
+
+public class MessageParams : PaginationParams
 {
-    public class MessageParams : PaginationParams
-    {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string Container { get; set; } = "Unread";
-    }
+    public int UserId { get; set; }
+
+    public string UserName { get; set; }
+
+    public string Container { get; set; } = "Unread";
 }

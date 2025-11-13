@@ -1,13 +1,12 @@
-﻿namespace DatingApp.Errors
-{
-    public class InvalidActionException : Exception
-    {
-        public InvalidActionException()
-        {
-        }
+﻿namespace DatingApp.Errors;
 
-        public InvalidActionException(string message) : base(message)
-        {
-        }
+public class InvalidActionException : Exception
+{
+    public InvalidActionException()
+    {
+    }
+
+    public InvalidActionException(string message) : base(message)
+    {
     }
 }

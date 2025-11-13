@@ -1,13 +1,12 @@
-﻿namespace DatingApp.Errors
-{
-    public class UnauthorizedException : Exception
-    {
-        public UnauthorizedException()
-        {
-        }
+﻿namespace DatingApp.Errors;
 
-        public UnauthorizedException(string message) : base(message)
-        {
-        }
+public class UnauthorizedException : Exception
+{
+    public UnauthorizedException()
+    {
+    }
+
+    public UnauthorizedException(string message) : base(message)
+    {
     }
 }

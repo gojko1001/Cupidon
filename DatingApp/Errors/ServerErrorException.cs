@@ -1,13 +1,12 @@
-﻿namespace DatingApp.Errors
-{
-    public class ServerErrorException : Exception
-    {
-        public ServerErrorException()
-        {
-        }
+﻿namespace DatingApp.Errors;
 
-        public ServerErrorException(string message) : base(message)
-        {
-        }
+public class ServerErrorException : Exception
+{
+    public ServerErrorException()
+    {
+    }
+
+    public ServerErrorException(string message) : base(message)
+    {
     }
 }

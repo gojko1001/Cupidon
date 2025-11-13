@@ -1,13 +1,12 @@
-﻿namespace DatingApp.Errors
-{
-    public class NotFoundException : Exception
-    {
-        public NotFoundException()
-        {
-        }
+﻿namespace DatingApp.Errors;
 
-        public NotFoundException(string message) : base(message)
-        {
-        }
+public class NotFoundException : Exception
+{
+    public NotFoundException()
+    {
+    }
+
+    public NotFoundException(string message) : base(message)
+    {
     }
 }

@@ -1,8 +1,8 @@
-﻿namespace DatingApp.Utils.Pagination
+﻿namespace DatingApp.Utils.Pagination;
+
+public class RelationParams : PaginationParams
 {
-    public class RelationParams : PaginationParams
-    {
-        public int UserId { get; set; }
-        public string Predicate { get; set; }
-    }
+    public int UserId { get; set; }
+
+    public string Predicate { get; set; }
 }

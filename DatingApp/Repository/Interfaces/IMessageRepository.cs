@@ -2,14 +2,17 @@
 using DatingApp.Entities;
 using DatingApp.Utils.Pagination;
 
-namespace DatingApp.Repository.Interfaces
+namespace DatingApp.Repository.Interfaces;
+
+public interface IMessageRepository
 {
-    public interface IMessageRepository
-    {
-        void AddMessage(Message message);
-        void RemoveMessage(Message message);
-        Task<Message> GetMessage(int id);
-        IQueryable<MessageDto> GetMessagesForUser(MessageParams messageParams);
-        Task<IEnumerable<Message>> GetMessageThread(string currentUsername, string recipientUsername);
-    }
+    void AddMessage(Message message);
+
+    void RemoveMessage(Message message);
+
+    Task<Message> GetMessage(int id);
+
+    IQueryable<MessageDto> GetMessagesForUser(MessageParams messageParams);
+
+    Task<IEnumerable<Message>> GetMessageThread(string currentUsername, string recipientUsername);
 }

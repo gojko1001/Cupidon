@@ -1,52 +1,43 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DatingApp.Data;
 using DatingApp.Entities;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
-namespace API
+namespace DatingApp;
+
+public class Program
 {
-    public class Program
+    public static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
+        var host = CreateHostBuilder(args).Build();
+        using var scope = host.Services.CreateScope();
+        var services = scope.ServiceProvider;
+        try
         {
-            var host = CreateHostBuilder(args).Build();
-            using var scope = host.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            try
-            {
-                var context = services.GetRequiredService<DataContext>();
-                var userManager = services.GetRequiredService<UserManager<AppUser>>();
-                var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
-                
-                await context.Database.MigrateAsync();
+            var context = services.GetRequiredService<DataContext>();
+            var userManager = services.GetRequiredService<UserManager<AppUser>>();
+            var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
 
-                context.Connections.RemoveRange(context.Connections);
-                context.Groups.RemoveRange(context.Groups);
-                await context.SaveChangesAsync();
+            await context.Database.MigrateAsync();
 
-                await Seed.SeedUsers(userManager, roleManager);
-            }
-            catch (Exception ex)
-            {
-                var logger = services.GetRequiredService<ILogger>();
-                logger.LogError(ex, "An error occured during migration");
-            }
-            await host.RunAsync();
+            context.Connections.RemoveRange(context.Connections);
+            context.Groups.RemoveRange(context.Groups);
+            await context.SaveChangesAsync();
+
+            await Seed.SeedUsers(userManager, roleManager);
         }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger>();
+            logger.LogError(ex, "An error occured during migration");
+        }
+        await host.RunAsync();
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
 }

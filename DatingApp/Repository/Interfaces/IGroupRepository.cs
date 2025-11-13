@@ -1,13 +1,16 @@
 ﻿using DatingApp.Entities;
 
-namespace DatingApp.Repository.Interfaces
+namespace DatingApp.Repository.Interfaces;
+
+public interface IGroupRepository
 {
-    public interface IGroupRepository
-    {
-        void AddGroup(Group group);
-        void RemoveConnection(Connection connection);
-        Task<Connection> GetConnectionAsync(string connectionId);
-        Task<Group> GetMessageGroup(string groupName);
-        Task<Group> GetGroupForConnection(string connectionId);
-    }
+    void AddGroup(Group group);
+
+    void RemoveConnection(Connection connection);
+
+    Task<Connection> GetConnectionAsync(string connectionId);
+
+    Task<Group> GetMessageGroup(string groupName);
+
+    Task<Group> GetGroupForConnection(string connectionId);
 }
